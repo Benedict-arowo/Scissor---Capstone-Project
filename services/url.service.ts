@@ -84,8 +84,7 @@ class UrlService {
 	};
 
 	public visit = async (id: string, user_info: any) => {
-		const { _ip, browser, os } = user_info;
-		const ip = "197.210.29.208";
+		const { ip, browser, os } = user_info;
 		// TODO:
 		// -	is_safe
 		// -   password
