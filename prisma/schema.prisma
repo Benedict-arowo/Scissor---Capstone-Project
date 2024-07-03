@@ -26,7 +26,7 @@ model Url {
   short_url String @unique
   long_url String
   expiration_date DateTime
-  qr_code String?
+  qr_code Json? 
   password String?
   is_safe Boolean @default(false)
   clicks UrlClick[]

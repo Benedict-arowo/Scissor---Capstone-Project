@@ -6,6 +6,8 @@ import ErrorParent, {
 } from "../middlewears/error";
 import argon from "argon2";
 import axios from "axios";
+import config from "../config";
+import { upload } from "../middlewears/cloudinary_uploader";
 
 class UrlService {
 	/**
@@ -64,6 +66,10 @@ class UrlService {
 			hashed_password = await this.hashPassword(data.password);
 		}
 
+		const QR_CODE = await this.generateQRCode(
+			config.BASE_URL + data.short_url
+		);
+
 		// TODO: Figure if the long_url is safe
 		// TODO: Generate QR Code
 		const url = await URL.create({
@@ -73,6 +79,13 @@ class UrlService {
 				expiration_date: new Date(data.expiration_date),
 				password: hashed_password,
 				owner_id: data.user_id && data.user_id,
+				qr_code:
+					QR_CODE !== undefined
+						? {
+								url: QR_CODE.secure_url,
+								id: QR_CODE.public_id,
+						  }
+						: undefined,
 			},
 		});
 
@@ -88,7 +101,6 @@ class UrlService {
 		// TODO:
 		// -	is_safe
 		// -   password
-		// -   qr code
 
 		try {
 			const url = await URL.update({
@@ -198,14 +210,44 @@ class UrlService {
 				}, // 7 days
 			},
 		});
-		console.log(url_click);
 		return url_click ? false : true;
+	};
+
+	private generateQRCode = async (url: string) => {
+		const qr = await axios.get(
+			"https://api.qrserver.com/v1/create-qr-code/?",
+			{
+				responseType: "text",
+				params: {
+					data: url,
+					size: "150x150",
+					format: "svg",
+					qzone: 2,
+					color: "50-15-0",
+				},
+			}
+		);
+
+		const uploaded = await upload({
+			file: Buffer.from(qr.data),
+			opts: {
+				path: "",
+				format: "svg",
+			},
+		});
+		return uploaded;
 	};
 
 	private updateUserIpInfo = async (ip: string, url_click_id: string) => {
 		try {
 			const request = await axios.get(
-				`http://api.weatherapi.com/v1/ip.json?key=${"cb275d17ab454d83943200744243006"}&q=${ip}`
+				`http://api.weatherapi.com/v1/ip.json`,
+				{
+					params: {
+						key: config.TOKENS.WEATHER_API,
+						q: ip,
+					},
+				}
 			);
 
 			const {

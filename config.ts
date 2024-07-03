@@ -2,6 +2,7 @@ require("dotenv").config({ path: "./.env" });
 
 const config: Iconfig = {
 	ROUTE_PREFIX: "api",
+	BASE_URL: "https://localhost.com/",
 	NODE_ENV: "development",
 	PORT: parseInt(process.env.PORT as string) || 5000,
 	DB: {
@@ -10,6 +11,14 @@ const config: Iconfig = {
 		USER: process.env.USER as string,
 		PASSWORD: process.env.PASSWORD as string,
 		DATABASE: process.env.DATABASE as string,
+	},
+	TOKENS: {
+		WEATHER_API: process.env.WEATHER_API_TOKEN as string,
+		CLOUDINARY: {
+			CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+			API_KEY: process.env.CLOUDINARY_API_KEY as string,
+			API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+		},
 	},
 	CORS_OPTION: {
 		origin: process.env.CORS_ORIGIN
@@ -22,6 +31,7 @@ export default config;
 
 interface Iconfig {
 	ROUTE_PREFIX?: string;
+	BASE_URL: string;
 	NODE_ENV: "development" | "production";
 	PORT: number;
 	DB: {
@@ -30,6 +40,14 @@ interface Iconfig {
 		USER: string;
 		PASSWORD: string;
 		DATABASE: string;
+	};
+	TOKENS: {
+		WEATHER_API: string;
+		CLOUDINARY: {
+			CLOUD_NAME: string;
+			API_KEY: string;
+			API_SECRET: string;
+		};
 	};
 	CORS_OPTION: {
 		origin: string | string[];
