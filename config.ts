@@ -1,10 +1,16 @@
 require("dotenv").config({ path: "./.env" });
 
 const config: Iconfig = {
-	ROUTE_PREFIX: "api",
+	ROUTE_PREFIX: "",
 	BASE_URL: "https://localhost.com/",
 	NODE_ENV: "development",
 	PORT: parseInt(process.env.PORT as string) || 5000,
+	OPTIONS: {
+		SCAN_URLS: false,
+		UPDATE_USER_IP_INFO: false,
+		TOKEN_EXPIRY_DAYS: 7,
+		TOKEN_LENGTH: 32,
+	},
 	DB: {
 		HOST: process.env.HOST as string,
 		PORT: parseInt(process.env.PORT as string),
@@ -19,6 +25,7 @@ const config: Iconfig = {
 			API_KEY: process.env.CLOUDINARY_API_KEY as string,
 			API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
 		},
+		VIRUSTOTAL_API_KEY: process.env.VIRUSTOTAL_API_KEY as string,
 	},
 	CORS_OPTION: {
 		origin: process.env.CORS_ORIGIN
@@ -34,6 +41,12 @@ interface Iconfig {
 	BASE_URL: string;
 	NODE_ENV: "development" | "production";
 	PORT: number;
+	OPTIONS: {
+		SCAN_URLS: boolean;
+		UPDATE_USER_IP_INFO: boolean;
+		TOKEN_EXPIRY_DAYS: number;
+		TOKEN_LENGTH: number;
+	};
 	DB: {
 		HOST: string;
 		PORT: number;
@@ -48,6 +61,7 @@ interface Iconfig {
 			API_KEY: string;
 			API_SECRET: string;
 		};
+		VIRUSTOTAL_API_KEY: string;
 	};
 	CORS_OPTION: {
 		origin: string | string[];

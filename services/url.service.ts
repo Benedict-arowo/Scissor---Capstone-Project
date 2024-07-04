@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { URL, URLClick } from "../prisma/db";
 import ErrorParent, {
 	BadrequestError,
+	InternalServerError,
 	NotFoundError,
 } from "../middlewears/error";
 import argon from "argon2";
@@ -70,8 +71,6 @@ class UrlService {
 			config.BASE_URL + data.short_url
 		);
 
-		// TODO: Figure if the long_url is safe
-		// TODO: Generate QR Code
 		const url = await URL.create({
 			data: {
 				short_url: data.short_url,
@@ -89,17 +88,65 @@ class UrlService {
 			},
 		});
 
+		// TODO: QR Code generation to be handled by background workers
+		// TODO: Let workers handle this
+		if (config.OPTIONS.SCAN_URLS)
+			await this.updateUrlInfo(data.long_url, url.id);
+
 		return url;
 	};
 
-	public getMany = async () => {
-		return 0;
+	public getMany = async (user_id: string, opts: any) => {
+		const { page = 1, limit = 10 } = opts;
+
+		const data = await URL.findMany({
+			where: {
+				owner_id: user_id,
+			},
+			select: {
+				id: true,
+				short_url: true,
+				long_url: true,
+				created_at: true,
+				expiration_date: true,
+				is_safe: true,
+				clicks: {
+					orderBy: {
+						created_at: "desc",
+					},
+					select: {
+						id: true,
+						ip: true,
+						is_unique: true,
+						browser: true,
+						OS: true,
+						created_at: true,
+						city: true,
+						country: true,
+						region: true,
+						timezone: true,
+						lat: true,
+						lon: true,
+						ip_type: true,
+					},
+				},
+				qr_code: true,
+				last_visited: true,
+				_count: true,
+			},
+			orderBy: {
+				created_at: "desc",
+			},
+			take: limit,
+			skip: (page - 1) * limit,
+		});
+
+		return data;
 	};
 
 	public visit = async (id: string, user_info: any) => {
 		const { ip, browser, os } = user_info;
 		// TODO:
-		// -	is_safe
 		// -   password
 
 		try {
@@ -123,34 +170,44 @@ class UrlService {
 							: undefined,
 					OS:
 						os && os.name !== undefined
-							? +" | " + os.version
+							? os.name.toString() + " | " + os.version
 							: undefined,
 				},
 			});
 
 			// Update user IP info in background worker
 			// TODO: Let workers handle this
-			await this.updateUserIpInfo(ip, url_click.id);
+			if (config.OPTIONS.UPDATE_USER_IP_INFO)
+				await this.updateUserIpInfo(ip, url_click.id);
 
-			return url.long_url;
+			return { url: url.long_url, is_safe: url.is_safe };
 		} catch (error: any) {
 			console.log(error);
 			if (error.code === "P2025") {
 				throw new NotFoundError("URL does not exists");
 			}
-			throw new ErrorParent(
-				error.message,
-				StatusCodes.INTERNAL_SERVER_ERROR
-			);
+			throw new InternalServerError(error.message);
 		}
 	};
 
-	public update = async () => {
+	public update = async (id: string, user_id: string, data: any) => {
 		return 0;
 	};
 
-	public delete = async () => {
-		return 0;
+	public delete = async (id: string, user_id: string) => {
+		try {
+			await URL.delete({
+				where: {
+					id,
+					owner_id: user_id,
+				},
+			});
+			return 0;
+		} catch (error: any) {
+			if (error.code === "P2025")
+				throw new NotFoundError("URL does not exists");
+			throw new InternalServerError(error.message);
+		}
 	};
 
 	private isValidURL(str: string) {
@@ -192,6 +249,48 @@ class UrlService {
 		return await argon.hash(password);
 	};
 
+	private updateUrlInfo = async (long_url: string, url_id: string) => {
+		try {
+			const {
+				data: { data },
+			} = await axios.post(
+				"https://www.virustotal.com/api/v3/urls",
+				{ url: long_url },
+				{
+					headers: {
+						Accept: "application/json",
+						"Content-Type": "application/x-www-form-urlencoded",
+						"x-apikey": config.TOKENS.VIRUSTOTAL_API_KEY,
+					},
+				}
+			);
+			const {
+				data: { data: analyses_data },
+			} = await axios.get(
+				`https://www.virustotal.com/api/v3/analyses/${data.id}`,
+				{
+					headers: {
+						Accept: "application/json",
+						"Content-Type": "application/json",
+						"x-apikey": config.TOKENS.VIRUSTOTAL_API_KEY,
+					},
+				}
+			);
+
+			const { malicious, suspicious } = analyses_data.attributes.stats;
+
+			await URL.update({
+				where: { id: url_id },
+				data: {
+					is_safe: malicious === 0 && suspicious === 0 ? true : false,
+				},
+			});
+			return 0;
+		} catch (error: any) {
+			console.log("Error updating URLINFO", error.message);
+			console.log(error);
+		}
+	};
 	/**
 	 * Checks if a given IP and URL combination is unique within the last 7 days.
 	 * @param ip - The IP address to check.
@@ -202,7 +301,7 @@ class UrlService {
 		const url_click = await URLClick.findFirst({
 			where: {
 				ip,
-				url_id,
+				// url_id,
 				created_at: {
 					gte: new Date(
 						new Date().getTime() - 1000 * 60 * 60 * 24 * 7
@@ -281,7 +380,8 @@ class UrlService {
 			} else if (error.code == "P2025") {
 				console.log("Record not found.");
 			} else {
-				console.log("Fetch Error", error.message);
+				console.log("Fetch Error - UpdateUserIPInfo", error.message);
+				console.log(error);
 			}
 		}
 	};

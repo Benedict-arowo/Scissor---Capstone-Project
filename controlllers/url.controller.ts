@@ -28,12 +28,12 @@ class UrlController {
 		const { id } = req.params;
 		const parsed_user_agent = UAParser(req.headers["user-agent"]);
 
-		const url = await urlService.visit(id, {
+		const data = await urlService.visit(id, {
 			...parsed_user_agent,
 			ip: req.ip,
 		});
 
-		return res.redirect(url as string);
+		return res.render("redirect", { url: data.url, is_safe: data.is_safe });
 	});
 
 	public update = async (req: Request, res: Response) => {

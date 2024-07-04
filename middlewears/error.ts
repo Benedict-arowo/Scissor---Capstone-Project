@@ -31,4 +31,10 @@ export class NotFoundError extends ErrorParent {
 	}
 }
 
+export class InternalServerError extends ErrorParent {
+	constructor(message: string) {
+		super(message ? message : "Internal Server Error", 500);
+	}
+}
+
 export default ErrorParent;

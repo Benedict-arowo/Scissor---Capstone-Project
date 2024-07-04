@@ -7,6 +7,7 @@ import ErrorHandler from "./middlewears/error_handler.middlewear";
 const app = express();
 
 app.use(morgan("dev"));
+app.set("view engine", "pug");
 app.use(cors(config.CORS_OPTION));
 app.use(express.json());
 Routes(app);
