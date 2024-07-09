@@ -1,14 +1,11 @@
-import { Request, Response } from "express";
-import { StatusCodes } from "http-status-codes";
 import { Token } from "../prisma/db";
-import { BadrequestError } from "../middlewears/error";
-// const crypto = require('crypto');
+import { BadrequestError, InternalServerError } from "../middlewears/error";
 import crypto from "crypto";
 import config from "../config";
 
 class TokenController {
 	public create = async (user_id: string, origin: string[]) => {
-		const token = await Token.findMany({
+		const token = await Token.findUnique({
 			where: {
 				user_id,
 			},
@@ -67,13 +64,20 @@ class TokenController {
 	};
 
 	public delete = async (user_id: string) => {
-		await Token.deleteMany({
-			where: {
-				user_id,
-			},
-		});
+		try {
+			await Token.delete({
+				where: {
+					user_id,
+				},
+			});
 
-		return 0;
+			return 0;
+		} catch (error: any) {
+			console.log(error);
+			if (error.code === "P2025")
+				throw new BadrequestError("Token does not exist.");
+			return new InternalServerError(error.message);
+		}
 	};
 
 	private calculateExpirationDate = (days: number) => {

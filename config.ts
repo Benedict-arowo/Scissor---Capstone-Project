@@ -1,10 +1,11 @@
 require("dotenv").config({ path: "./.env" });
 
 const config: Iconfig = {
-	ROUTE_PREFIX: "",
+	ROUTE_PREFIX: "api",
 	BASE_URL: "https://localhost.com/",
 	NODE_ENV: "development",
 	PORT: parseInt(process.env.PORT as string) || 5000,
+	JWT_SECERET: process.env.JWT_SECERET as string,
 	OPTIONS: {
 		SCAN_URLS: false,
 		UPDATE_USER_IP_INFO: false,
@@ -41,6 +42,7 @@ interface Iconfig {
 	BASE_URL: string;
 	NODE_ENV: "development" | "production";
 	PORT: number;
+	JWT_SECERET: string;
 	OPTIONS: {
 		SCAN_URLS: boolean;
 		UPDATE_USER_IP_INFO: boolean;

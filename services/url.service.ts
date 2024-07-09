@@ -9,6 +9,7 @@ import argon from "argon2";
 import axios from "axios";
 import config from "../config";
 import { upload } from "../middlewears/cloudinary_uploader";
+import Wrapper from "../middlewears/wrapper";
 
 class UrlService {
 	/**
@@ -190,8 +191,52 @@ class UrlService {
 		}
 	};
 
-	public update = async (id: string, user_id: string, data: any) => {
-		return 0;
+	public getOne = async (user_id: string, url_id: string) => {
+		try {
+			const url = await URL.findUniqueOrThrow({
+				where: { id: url_id, owner_id: user_id },
+			});
+
+			return url;
+		} catch (error: any) {
+			if (error.code === "P2025")
+				throw new NotFoundError("URL does not exists");
+			throw new InternalServerError(error.message);
+		}
+	};
+
+	public update = async (url_id: string, user_id: string, data: any) => {
+		if (data.long_url && !this.isValidURL(data.long_url))
+			throw new BadrequestError("Invalid URL provided.");
+
+		if (
+			data.short_url &&
+			!(
+				data.short_url.length >= 5 &&
+				(data.short_url as string).length <= 8
+			)
+		) {
+			throw new BadrequestError(
+				"Short URL must be between 5-8 characters."
+			);
+		}
+		if (data.password) {
+			data.password = await this.hashPassword(data.password);
+		}
+
+		const url = await URL.update({
+			where: {
+				id: url_id,
+				owner_id: user_id,
+			},
+			data: {
+				long_url: data.long_url && data.long_url,
+				password: data.password && data.password,
+				short_url: data.short_url && data.short_url,
+			},
+		});
+
+		return url;
 	};
 
 	public delete = async (id: string, user_id: string) => {

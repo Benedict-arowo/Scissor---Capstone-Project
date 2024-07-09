@@ -31,7 +31,7 @@ model Url {
   is_safe Boolean @default(false)
   clicks UrlClick[]
   last_visited DateTime?
-  owner User? @relation(fields: [owner_id], references: [email])
+  owner User? @relation(fields: [owner_id], references: [email], onDelete: Cascade)
   owner_id String?
   created_at DateTime @default(now())
 }
@@ -49,7 +49,7 @@ model UrlClick {
   lat Int?
   lon Int?
   browser String?
-  url Url @relation(fields: [url_id], references: [id])
+  url Url @relation(fields: [url_id], references: [id], onDelete: Cascade)
   url_id String
   created_at DateTime @default(now())
 }
@@ -60,6 +60,6 @@ model Token {
   origin String[]
   is_revoked Boolean
   last_used DateTime @default(now())
-  user User? @relation(fields: [user_id], references: [email])
+  user User? @relation(fields: [user_id], references: [email], onDelete: Cascade)
   user_id String? @unique
 }

@@ -1,13 +1,16 @@
 import express from "express";
 import urlController from "../controlllers/url.controller";
+import Authenticate from "../middlewears/authenticate";
 const Router = express.Router();
 
-Router.get("/:id", urlController.visit);
-Router.route("/url/").get(urlController.getMany).post(urlController.create);
+Router.route("/url/")
+	.get(Authenticate, urlController.getMany)
+	.post(Authenticate, urlController.create);
 Router.route("/url/:id")
-	.get(urlController.getOne)
-	.patch(urlController.update)
-	.delete(urlController.delete);
+	.get(Authenticate, urlController.getOne)
+	.patch(Authenticate, urlController.update)
+	.delete(Authenticate, urlController.delete);
+// Router.get("/:id", urlController.visit); ! Moved to routes/index.ts file
 
 export default {
 	routeUrl: "",

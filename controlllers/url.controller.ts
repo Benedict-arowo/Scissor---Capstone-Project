@@ -6,23 +6,32 @@ import Wrapper from "../middlewears/wrapper";
 
 class UrlController {
 	public create = Wrapper(async (req: Request, res: Response) => {
-		const data = await urlService.create(req.body);
+		const {
+			user: { email },
+		} = req as any;
+		const data = await urlService.create({ ...req.body, user_id: email });
 		return res
 			.status(StatusCodes.CREATED)
 			.json({ message: "Url Created.", data });
 	});
 
-	public getMany = async (req: Request, res: Response) => {
-		return res
-			.status(StatusCodes.OK)
-			.json({ message: "success", data: "" });
-	};
+	public getMany = Wrapper(async (req: Request, res: Response) => {
+		const {
+			user: { email },
+		} = req as any;
+		const data = await urlService.getMany(email, { page: 1, limit: 10 });
+		return res.status(StatusCodes.OK).json({ message: "success", data });
+	});
 
-	public getOne = async (req: Request, res: Response) => {
-		return res
-			.status(StatusCodes.OK)
-			.json({ message: "success", data: "" });
-	};
+	public getOne = Wrapper(async (req: Request, res: Response) => {
+		const {
+			user: { email },
+			params: { id: url_id },
+		} = req as any;
+		const data = await urlService.getOne(email, url_id);
+
+		return res.status(StatusCodes.OK).json({ message: "success", data });
+	});
 
 	public visit = Wrapper(async (req: Request, res: Response) => {
 		const { id } = req.params;
@@ -37,16 +46,25 @@ class UrlController {
 	});
 
 	public update = async (req: Request, res: Response) => {
+		const {
+			params: { id },
+			user: { email },
+			body,
+		} = req as any;
+		const data = await urlService.update(id, email, body);
 		return res
 			.status(StatusCodes.OK)
-			.json({ message: "success", data: "" });
+			.json({ message: "success", data: data });
 	};
 
-	public delete = async (req: Request, res: Response) => {
-		return res
-			.status(StatusCodes.OK)
-			.json({ message: "success", data: "" });
-	};
+	public delete = Wrapper(async (req: Request, res: Response) => {
+		const {
+			params: { id },
+			user: { email },
+		} = req as any;
+		await urlService.delete(id, email);
+		return res.status(StatusCodes.OK).json({ message: "success" });
+	});
 }
 
 export default new UrlController();

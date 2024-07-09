@@ -3,6 +3,7 @@ import config from "../config";
 import { Express, Router } from "express";
 import demoRouter from "./demo.router";
 import fs from "fs";
+import urlController from "../controlllers/url.controller";
 
 const routelist = <{ default: { routeUrl: string; Router: Router } }[]>[];
 
@@ -31,6 +32,7 @@ const Routes = (app: Express) => {
 		app.use(url, Router);
 	});
 
+	app.get("/:id", urlController.visit);
 	console.log(`Successfully imported ${routelist.length} router(s)`);
 };
 
