@@ -1,7 +1,7 @@
 const nav = () => {
 	return (
 		<nav className="w-full bg-white shadow-lg px-12 py-4 flex flex-row justify-between items-center">
-			<h1>Logo</h1>
+			<h1 tabIndex={1}>Logo</h1>
 
 			<div className="flex flex-row gap-3">
 				<button className="py-1.5 px-5 hover:font-medium">Login</button>
