@@ -85,13 +85,13 @@ class UrlService {
 				expiration_date: new Date(data.expiration_date),
 				password: hashed_password,
 				owner_id: data.user_id && data.user_id,
-				// qr_code:
-				// 	QR_CODE !== undefined
-				// 		? {
-				// 				url: QR_CODE.secure_url,
-				// 				id: QR_CODE.public_id,
-				// 		  }
-				// 		: undefined,
+				qr_code:
+					QR_CODE !== undefined
+						? {
+								url: QR_CODE.secure_url,
+								id: QR_CODE.public_id,
+						  }
+						: undefined,
 			},
 		});
 
@@ -189,7 +189,7 @@ class UrlService {
 
 			return { url: url.long_url, is_safe: url.is_safe };
 		} catch (error: any) {
-			console.log(error);
+			// console.log(error);
 			if (error.code === "P2025") {
 				throw new NotFoundError("URL does not exists");
 			}
@@ -364,8 +364,9 @@ class UrlService {
 	};
 
 	private generateQRCode = async (url: string) => {
+		console.log(url);
 		const qr = await axios.get(
-			"https://api.qrserver.com/v1/create-qr-code",
+			"http://api.qrserver.com/v1/create-qr-code",
 			{
 				responseType: "text",
 				params: {
@@ -377,6 +378,7 @@ class UrlService {
 				},
 			}
 		);
+		console.log(1);
 
 		const uploaded = await upload({
 			file: Buffer.from(qr.data),

@@ -4,7 +4,16 @@ import cors from "cors";
 import morgan from "morgan";
 import Routes from "./routes/index";
 import ErrorHandler from "./middlewears/error_handler.middlewear";
+import fs from "fs";
+
 const app = express();
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yaml");
+
+const file = fs.readFileSync("./swagger.yaml", "utf8");
+const swaggerDocument = YAML.parse(file);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(morgan("dev"));
 app.set("view engine", "pug");
