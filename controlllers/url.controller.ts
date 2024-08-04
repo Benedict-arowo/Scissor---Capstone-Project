@@ -6,10 +6,10 @@ import Wrapper from "../middlewears/wrapper";
 
 class UrlController {
 	public create = Wrapper(async (req: Request, res: Response) => {
-		const {
-			user: { email },
-		} = req as any;
-		const data = await urlService.create({ ...req.body, user_id: email });
+		const data = await urlService.create({
+			...req.body,
+			user_id: (req as any).user ? (req as any).user.email : undefined,
+		});
 		return res
 			.status(StatusCodes.CREATED)
 			.json({ message: "Url Created.", data });

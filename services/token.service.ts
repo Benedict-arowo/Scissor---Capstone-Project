@@ -1,10 +1,14 @@
 import { Token } from "../prisma/db";
-import { BadrequestError, InternalServerError } from "../middlewears/error";
+import {
+	BadrequestError,
+	InternalServerError,
+	NotFoundError,
+} from "../middlewears/error";
 import crypto from "crypto";
 import config from "../config";
 
 class TokenController {
-	public create = async (user_id: string, origin: string[]) => {
+	public create = async (user_id: string) => {
 		const token = await Token.findUnique({
 			where: {
 				user_id,
@@ -25,42 +29,14 @@ class TokenController {
 					config.OPTIONS.TOKEN_EXPIRY_DAYS || 7
 				),
 				is_revoked: false,
-				origin: origin ? origin : undefined,
 			},
 			select: {
 				token: true,
 				expiration_date: true,
-				origin: true,
 			},
 		});
 
 		return new_token;
-	};
-
-	public update = async (user_id: string, origin: string[]) => {
-		const token = await Token.findUniqueOrThrow({
-			where: {
-				user_id: user_id,
-			},
-		});
-
-		if (token.is_revoked)
-			throw new BadrequestError("Token has been revoked.");
-
-		const updated_token = await Token.update({
-			where: {
-				user_id,
-			},
-			data: {
-				origin,
-			},
-			select: {
-				expiration_date: true,
-				origin: true,
-			},
-		});
-
-		return updated_token;
 	};
 
 	public delete = async (user_id: string) => {
@@ -75,7 +51,7 @@ class TokenController {
 		} catch (error: any) {
 			console.log(error);
 			if (error.code === "P2025")
-				throw new BadrequestError("Token does not exist.");
+				throw new NotFoundError("Token does not exist.");
 			return new InternalServerError(error.message);
 		}
 	};

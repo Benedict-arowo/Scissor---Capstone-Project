@@ -1,12 +1,12 @@
 import express from "express";
 import tokenController from "../controlllers/token.controller";
-import Authenticate from "../middlewears/authenticate";
+import { AuthenticatedOnly } from "../middlewears/authenticated";
+import { limiter } from ".";
 const Router = express.Router();
 
 Router.route("/")
-	.post(Authenticate, tokenController.create)
-	.put(Authenticate, tokenController.update)
-	.delete(Authenticate, tokenController.delete);
+	.post(AuthenticatedOnly, limiter, tokenController.create)
+	.delete(AuthenticatedOnly, tokenController.delete);
 
 export default {
 	routeUrl: "token",

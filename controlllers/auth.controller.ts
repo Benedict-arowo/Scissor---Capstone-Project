@@ -18,6 +18,7 @@ class AuthController {
 		const {
 			body: { email, password },
 		} = req;
+		console.log(email, password);
 		const user = await authService.register(email, password);
 
 		return res.json({

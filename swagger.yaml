@@ -1,0 +1,270 @@
+openapi: 3.0.0
+info:
+    title: Swagger API Documentation
+    description: This is the documentation for Swagger API
+    version: 1.0.0
+servers:
+    - url: http://localhost:8900/api/v1
+      description: Development server
+tags:
+    - name: Authentication
+      description: Endpoints for user authentication
+    - name: URL
+      description: Endpoints for URL operations
+    - name: Token
+      description: Endpoints for Token operations
+
+paths:
+    /auth/register:
+        post:
+            description: Register a new user
+            tags:
+                - Authentication
+            security: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                    default: johndoe@email.com
+                                password:
+                                    type: string
+                                    default: securePassword123
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        default: Registration successful
+                                    data:
+                                        type: object
+                                        properties:
+                                            email:
+                                                type: string
+                                            created_at:
+                                                type: string
+                "409":
+                    $ref: "#/components/responses/409"
+                "422":
+                    $ref: "#/components/responses/422"
+    /auth/login:
+        post:
+            description: "Login a user"
+            tags:
+                - Authentication
+            security: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                    default: johndoe@email.com
+                                password:
+                                    type: string
+                                    default: securePassword123
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        default: Login successful.
+                                    data:
+                                        type: object
+                                        properties:
+                                            access_token:
+                                                type: string
+                                            user:
+                                                type: object
+                                                properties:
+                                                    email:
+                                                        type: string
+                                                    created_at:
+                                                        type: string
+                "401":
+                    $ref: "#/components/responses/401"
+                "422":
+                    $ref: "#/components/responses/422"
+
+    /token:
+        post:
+            description: "Creates a new token"
+            tags:
+                - Token
+            security: []
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        default: Token created.
+                                    data:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                                            expiration_date:
+                                                type: string
+                "401":
+                    $ref: "#/components/responses/401"
+                "400":
+                    $ref: "#/components/responses/400"
+        delete:
+            description: "Deletes a token"
+            tags:
+                - Token
+            security: []
+            responses:
+                "204":
+                    description: No Content
+                "401":
+                    $ref: "#/components/responses/401"
+                "404":
+                    $ref: "#/components/responses/404"
+
+components:
+    securitySchemes:
+        cookieAuth:
+            type: apiKey
+            name: __acetoken
+            in: cookie
+        resetAuth:
+            type: apiKey
+            name: _rstpwd
+            in: cookie
+    schemas:
+        User:
+            type: object
+            properties:
+                id:
+                    type: string
+                first_name:
+                    type: string
+                last_name:
+                    type: string
+                email:
+                    type: string
+                role:
+                    type: string
+    responses:
+        "400":
+            description: Bad request
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            success:
+                                type: boolean
+                                default: false
+                            message:
+                                type: string
+                                default: Bad request
+        "401":
+            description: Unauthorized
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            success:
+                                type: boolean
+                                default: false
+                            message:
+                                type: string
+                                default: Unauthorized
+        "403":
+            description: Forbidden
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            success:
+                                type: boolean
+                                default: false
+                            message:
+                                type: string
+                                default: Forbidden
+        "404":
+            description: Not found
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            success:
+                                type: boolean
+                                default: false
+                            message:
+                                type: string
+                                default: Not found
+        "409":
+            description: Conflict
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            success:
+                                type: boolean
+                                default: false
+                            message:
+                                type: string
+                                default: Conflict
+        "422":
+            description: Unprocessable Entity
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            success:
+                                type: boolean
+                                default: false
+                            message:
+                                type: string
+                                default: Unprocessable Entity
+        "500":
+            description: Internal Server Error
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            success:
+                                type: boolean
+                                default: false
+                            message:
+                                type: string
+                                default: Internal Server Error
+        deleted:
+            description: Deleted
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            message:
+                                type: string
+                                default: success

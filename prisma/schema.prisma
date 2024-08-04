@@ -57,7 +57,6 @@ model UrlClick {
 model Token {
   token String @id @default(cuid())
   expiration_date DateTime
-  origin String[]
   is_revoked Boolean
   last_used DateTime @default(now())
   user User? @relation(fields: [user_id], references: [email], onDelete: Cascade)

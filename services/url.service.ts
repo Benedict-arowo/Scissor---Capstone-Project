@@ -20,7 +20,6 @@ class UrlService {
 	 */
 	public create = async (data: UrlServiceCreate) => {
 		let hashed_password: string | undefined;
-
 		if (!this.isValidURL(data.long_url))
 			throw new BadrequestError("Invalid URL provided.");
 
@@ -59,6 +58,13 @@ class UrlService {
 			}
 		} while (valid_short_url === false);
 
+		if (!data.expiration_date) {
+			const threeMonthsFromNow = new Date();
+			threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
+
+			data.expiration_date = threeMonthsFromNow;
+		}
+
 		if (!this.isWithinSixMonths(new Date(data.expiration_date)))
 			throw new BadrequestError(
 				"Expiration date must be within 6 months."
@@ -79,13 +85,13 @@ class UrlService {
 				expiration_date: new Date(data.expiration_date),
 				password: hashed_password,
 				owner_id: data.user_id && data.user_id,
-				qr_code:
-					QR_CODE !== undefined
-						? {
-								url: QR_CODE.secure_url,
-								id: QR_CODE.public_id,
-						  }
-						: undefined,
+				// qr_code:
+				// 	QR_CODE !== undefined
+				// 		? {
+				// 				url: QR_CODE.secure_url,
+				// 				id: QR_CODE.public_id,
+				// 		  }
+				// 		: undefined,
 			},
 		});
 
@@ -359,7 +365,7 @@ class UrlService {
 
 	private generateQRCode = async (url: string) => {
 		const qr = await axios.get(
-			"https://api.qrserver.com/v1/create-qr-code/?",
+			"https://api.qrserver.com/v1/create-qr-code",
 			{
 				responseType: "text",
 				params: {

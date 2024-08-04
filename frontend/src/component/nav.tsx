@@ -1,4 +1,4 @@
-const nav = () => {
+const Nav = () => {
 	return (
 		<nav className="w-full bg-white shadow-lg px-12 py-4 flex flex-row justify-between items-center">
 			<h1 tabIndex={1}>Logo</h1>
@@ -13,4 +13,4 @@ const nav = () => {
 	);
 };
 
-export default nav;
+export default Nav;

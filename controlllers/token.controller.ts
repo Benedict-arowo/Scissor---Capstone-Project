@@ -7,23 +7,11 @@ class TokenController {
 	public create = Wrapper(async (req: Request, res: Response) => {
 		const {
 			user: { email },
-			body: { origin },
 		} = req as any;
-		const token = await tokenService.create(email, origin);
+		const token = await tokenService.create(email);
 		return res
 			.status(StatusCodes.CREATED)
 			.json({ message: "Token Created.", data: token });
-	});
-
-	public update = Wrapper(async (req: Request, res: Response) => {
-		const {
-			user: { email },
-			body: { origin },
-		} = req as any;
-		const token = await tokenService.update(email, origin);
-		return res
-			.status(StatusCodes.OK)
-			.json({ message: "Token Updated.", data: token });
 	});
 
 	public delete = Wrapper(async (req: Request, res: Response) => {

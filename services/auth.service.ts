@@ -1,5 +1,9 @@
 import config from "../config";
-import { BadrequestError, InternalServerError } from "../middlewears/error";
+import {
+	BadrequestError,
+	InternalServerError,
+	NotFoundError,
+} from "../middlewears/error";
 import { User } from "../prisma/db";
 import argon from "argon2";
 import jwt from "jsonwebtoken";
@@ -8,14 +12,16 @@ class AuthService {
 	public login = async (email: string, password: string) => {
 		try {
 			const user = await User.findUniqueOrThrow({ where: { email } });
-
+			console.log(user);
 			if (!(await this.verifyPassword(user.password, password)))
 				throw new BadrequestError("Invalid password.");
 			delete (user as any).password;
 			const token = this.generateToken({ email });
-			return { accessToken: token, user };
+			return { access_token: token, user };
 		} catch (error: any) {
 			console.log(error);
+			if (error.code === "P2025")
+				throw new NotFoundError("User not found.");
 			return new InternalServerError(error.message);
 		}
 	};
