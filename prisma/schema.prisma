@@ -27,7 +27,6 @@ model Url {
   long_url String
   expiration_date DateTime
   qr_code Json? 
-  password String?
   is_safe Boolean @default(false)
   clicks UrlClick[]
   last_visited DateTime?

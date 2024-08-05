@@ -7,9 +7,15 @@ import redisClient, {
 	deleteKeysByPattern,
 	getRedisKey,
 } from "../middlewears/redis_client";
+import validator from "../middlewears/validators";
+import {
+	CreateURLSchema,
+	UpdateURLSchema,
+} from "../middlewears/validators/url.validator";
 
 class UrlController {
 	public create = Wrapper(async (req: Request, res: Response) => {
+		validator(CreateURLSchema, req.body);
 		const data = await urlService.create({
 			...req.body,
 			user_id: (req as any).user ? (req as any).user.email : undefined,
@@ -66,6 +72,7 @@ class UrlController {
 	});
 
 	public update = async (req: Request, res: Response) => {
+		validator(UpdateURLSchema, req.body);
 		const {
 			params: { id },
 			user: { email },

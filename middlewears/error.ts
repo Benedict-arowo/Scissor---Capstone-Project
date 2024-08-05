@@ -1,3 +1,5 @@
+import { StatusCodes } from "http-status-codes";
+
 class ErrorParent extends Error {
 	code: number;
 
@@ -34,6 +36,15 @@ export class NotFoundError extends ErrorParent {
 export class InternalServerError extends ErrorParent {
 	constructor(message: string) {
 		super(message ? message : "Internal Server Error", 500);
+	}
+}
+
+export class ValidationError extends Error {
+	errors: { field: string; message: string }[];
+
+	constructor(errors: { field: string; message: string }[]) {
+		super("Validation Error");
+		this.errors = errors;
 	}
 }
 

@@ -19,7 +19,6 @@ class UrlService {
 	 * @throws BadrequestError if the URL is invalid, the short URL is already taken, or the expiration date is not within 6 months.
 	 */
 	public create = async (data: UrlServiceCreate) => {
-		let hashed_password: string | undefined;
 		if (!this.isValidURL(data.long_url))
 			throw new BadrequestError("Invalid URL provided.");
 
@@ -34,12 +33,12 @@ class UrlService {
 			} else {
 				if (
 					!(
-						data.short_url.length >= 5 &&
+						data.short_url.length >= 4 &&
 						(data.short_url as string).length <= 8
 					)
 				) {
 					throw new BadrequestError(
-						"Short URL must be between 5-8 characters."
+						"Short URL must be between 4-8 characters."
 					);
 				}
 			}
@@ -70,10 +69,6 @@ class UrlService {
 				"Expiration date must be within 6 months."
 			);
 
-		if (data.password) {
-			hashed_password = await this.hashPassword(data.password);
-		}
-
 		const QR_CODE = await this.generateQRCode(
 			config.BASE_URL + data.short_url
 		);
@@ -83,7 +78,6 @@ class UrlService {
 				short_url: data.short_url,
 				long_url: data.long_url,
 				expiration_date: new Date(data.expiration_date),
-				password: hashed_password,
 				owner_id: data.user_id && data.user_id,
 				qr_code:
 					QR_CODE !== undefined
@@ -153,8 +147,6 @@ class UrlService {
 
 	public visit = async (id: string, user_info: any) => {
 		const { ip, browser, os } = user_info;
-		// TODO:
-		// -   password
 
 		try {
 			const url = await URL.update({
@@ -226,9 +218,6 @@ class UrlService {
 				"Short URL must be between 5-8 characters."
 			);
 		}
-		if (data.password) {
-			data.password = await this.hashPassword(data.password);
-		}
 
 		const url = await URL.update({
 			where: {
@@ -237,7 +226,6 @@ class UrlService {
 			},
 			data: {
 				long_url: data.long_url && data.long_url,
-				password: data.password && data.password,
 				short_url: data.short_url && data.short_url,
 			},
 		});
@@ -294,10 +282,6 @@ class UrlService {
 			);
 		}
 		return result;
-	};
-
-	private hashPassword = async (password: string) => {
-		return await argon.hash(password);
 	};
 
 	private updateUrlInfo = async (long_url: string, url_id: string) => {
@@ -446,6 +430,5 @@ type UrlServiceCreate = {
 	short_url: string | undefined;
 	long_url: string;
 	expiration_date: Date;
-	password: string | undefined;
 	user_id: string | undefined;
 };
