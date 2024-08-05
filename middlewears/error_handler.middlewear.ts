@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import config from "../config";
-import ErrorParent from "./error";
+import ErrorParent, { ValidationError } from "./error";
+import { StatusCodes } from "http-status-codes";
 
 const ErrorHandler = (
 	err: any,
@@ -8,6 +9,11 @@ const ErrorHandler = (
 	res: Response,
 	next: NextFunction
 ) => {
+	if (err instanceof ValidationError)
+		return res
+			.status(StatusCodes.UNPROCESSABLE_ENTITY)
+			.json({ errors: err.errors });
+
 	if (err instanceof ErrorParent)
 		return res.status(err.code).json({
 			message: err.message,
