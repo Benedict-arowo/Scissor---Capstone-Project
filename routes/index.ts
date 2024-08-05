@@ -4,6 +4,7 @@ import fs from "fs";
 import { Express, Router } from "express";
 import urlController from "../controlllers/url.controller";
 import rateLimit from "express-rate-limit";
+import Cache from "../middlewears/cache";
 
 const routelist = <
 	{
@@ -47,7 +48,7 @@ const Routes = (app: Express) => {
 		app.use(url, Router);
 	});
 
-	app.get("/:id", urlController.visit);
+	app.get("/:id", Cache, urlController.visit);
 	console.log(`Successfully imported ${routelist.length} router(s)`);
 };
 

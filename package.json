@@ -25,6 +25,7 @@
 		"jsonwebtoken": "^9.0.2",
 		"node-cron": "^3.0.3",
 		"pug": "^3.0.3",
+		"redis": "^4.7.0",
 		"streamifier": "^0.1.1",
 		"swagger-ui-express": "^5.0.1",
 		"ua-parser-js": "^1.0.38",

@@ -3,6 +3,10 @@ import { StatusCodes } from "http-status-codes";
 import urlService from "../services/url.service";
 import UAParser from "ua-parser-js";
 import Wrapper from "../middlewears/wrapper";
+import redisClient, {
+	deleteKeysByPattern,
+	getRedisKey,
+} from "../middlewears/redis_client";
 
 class UrlController {
 	public create = Wrapper(async (req: Request, res: Response) => {
@@ -18,8 +22,17 @@ class UrlController {
 	public getMany = Wrapper(async (req: Request, res: Response) => {
 		const {
 			user: { email },
+			params: { page, limit },
 		} = req as any;
-		const data = await urlService.getMany(email, { page: 1, limit: 10 });
+		console.log(getRedisKey(req));
+		const data = await urlService.getMany(email, { page, limit });
+		redisClient.set(
+			getRedisKey(req),
+			JSON.stringify({ message: "success", data }),
+			{
+				EX: 60 * 60 * 12, // 12 hours
+			}
+		);
 		return res.status(StatusCodes.OK).json({ message: "success", data });
 	});
 
@@ -29,12 +42,19 @@ class UrlController {
 			params: { id: url_id },
 		} = req as any;
 		const data = await urlService.getOne(email, url_id);
-
+		redisClient.set(
+			getRedisKey(req),
+			JSON.stringify({ message: "success", data }),
+			{
+				EX: 60 * 60 * 12, // 12 hours
+			}
+		);
 		return res.status(StatusCodes.OK).json({ message: "success", data });
 	});
 
 	public visit = Wrapper(async (req: Request, res: Response) => {
 		const { id } = req.params;
+		console.log(req.url);
 		const parsed_user_agent = UAParser(req.headers["user-agent"]);
 
 		const data = await urlService.visit(id, {
@@ -52,6 +72,12 @@ class UrlController {
 			body,
 		} = req as any;
 		const data = await urlService.update(id, email, body);
+		// Removes the cached data if it exists about the user, and the updated data
+		const cacheKey = getRedisKey(req);
+		if (await redisClient.get(cacheKey)) {
+			redisClient.del(getRedisKey(req));
+			deleteKeysByPattern(`/url|+|${email}*`);
+		}
 		return res
 			.status(StatusCodes.OK)
 			.json({ message: "success", data: data });
@@ -63,6 +89,12 @@ class UrlController {
 			user: { email },
 		} = req as any;
 		await urlService.delete(id, email);
+		// Removes the cached data if it exists about the user, and the updated data
+		const cacheKey = getRedisKey(req);
+		if (await redisClient.get(cacheKey)) {
+			redisClient.del(getRedisKey(req));
+			deleteKeysByPattern(`/url|+|${email}*`);
+		}
 		return res.status(StatusCodes.OK).json({ message: "success" });
 	});
 }

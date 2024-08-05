@@ -13,7 +13,7 @@ const YAML = require("yaml");
 const file = fs.readFileSync("./swagger.yaml", "utf8");
 const swaggerDocument = YAML.parse(file);
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(morgan("dev"));
 app.set("view engine", "pug");
