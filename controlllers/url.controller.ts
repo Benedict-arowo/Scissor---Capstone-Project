@@ -71,7 +71,7 @@ class UrlController {
 		return res.render("redirect", { url: data.url, is_safe: data.is_safe });
 	});
 
-	public update = async (req: Request, res: Response) => {
+	public update = Wrapper(async (req: Request, res: Response) => {
 		validator(UpdateURLSchema, req.body);
 		const {
 			params: { id },
@@ -88,7 +88,7 @@ class UrlController {
 		return res
 			.status(StatusCodes.OK)
 			.json({ message: "success", data: data });
-	};
+	});
 
 	public delete = Wrapper(async (req: Request, res: Response) => {
 		const {
