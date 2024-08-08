@@ -12,7 +12,12 @@ Router.route("/url/:id")
 	.get(AuthenticatedOnly, limiter, Cache, urlController.getOne)
 	.patch(AuthenticatedOnly, urlController.update)
 	.delete(AuthenticatedOnly, urlController.delete);
-// Router.get("/:id", urlController.visit); ! Moved to routes/index.ts file
+Router.route("/url/:id/qrcode").post(
+	AuthenticatedOnly,
+	limiter,
+	urlController.generateQRCode
+);
+// Router.get("/:id", urlController.visit); !! Moved to routes/index.ts file
 
 export default {
 	routeUrl: "",

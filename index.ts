@@ -1,26 +1,14 @@
 import config from "./config";
-import express from "express";
-import cors from "cors";
-import morgan from "morgan";
-import Routes from "./routes/index";
-import ErrorHandler from "./middlewears/error_handler.middlewear";
 import fs from "fs";
 
-const app = express();
-const swaggerUi = require("swagger-ui-express");
-const YAML = require("yaml");
+import swaggerUi from "swagger-ui-express";
+import YAML from "yaml";
+import app from "./server";
 
 const file = fs.readFileSync("./swagger.yaml", "utf8");
 const swaggerDocument = YAML.parse(file);
 
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-app.use(morgan("dev"));
-app.set("view engine", "pug");
-app.use(cors(config.CORS_OPTION));
-app.use(express.json());
-Routes(app);
-app.use(ErrorHandler);
 
 try {
 	app.listen(config.PORT, () => {

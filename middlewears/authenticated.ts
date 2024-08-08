@@ -36,7 +36,7 @@ const CheckAuthentication = async (
 
 		if (!token) throw new BadrequestError("Invalid api_key provided.");
 		(req as any).user = token.user;
-		return;
+		return next();
 	}
 
 	const token = req.headers["authorization"];
@@ -97,6 +97,6 @@ export const AuthenticatedOnly = async (
 	} catch (error: any) {
 		if (error instanceof TokenExpiredError)
 			next(new UnauthorizedError("Token Exipred"));
-		next(new InternalServerError(error.message));
+		next(new UnauthorizedError(error.message));
 	}
 };

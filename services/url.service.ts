@@ -1,15 +1,12 @@
-import { StatusCodes } from "http-status-codes";
 import { URL, URLClick } from "../prisma/db";
-import ErrorParent, {
+import {
 	BadrequestError,
 	InternalServerError,
 	NotFoundError,
 } from "../middlewears/error";
-import argon from "argon2";
 import axios from "axios";
 import config from "../config";
 import { upload } from "../middlewears/cloudinary_uploader";
-import Wrapper from "../middlewears/wrapper";
 
 class UrlService {
 	/**
@@ -69,23 +66,12 @@ class UrlService {
 				"Expiration date must be within 6 months."
 			);
 
-		const QR_CODE = await this.generateQRCode(
-			config.BASE_URL + data.short_url
-		);
-
 		const url = await URL.create({
 			data: {
 				short_url: data.short_url,
 				long_url: data.long_url,
 				expiration_date: new Date(data.expiration_date),
 				owner_id: data.user_id && data.user_id,
-				qr_code:
-					QR_CODE !== undefined
-						? {
-								url: QR_CODE.secure_url,
-								id: QR_CODE.public_id,
-						  }
-						: undefined,
 			},
 		});
 
@@ -262,6 +248,49 @@ class UrlService {
 		return pattern.test(str);
 	}
 
+	public QRCode = async (id: string, user_id: string) => {
+		try {
+			const url = await URL.findUniqueOrThrow({
+				where: {
+					id,
+					owner_id: user_id,
+				},
+			});
+
+			const QR_CODE = await this.generateQRCode(
+				config.BASE_URL + url.short_url
+			);
+
+			if (QR_CODE === undefined)
+				throw new InternalServerError("Error generating QR code.");
+
+			await URL.update({
+				where: {
+					id,
+					owner_id: user_id,
+				},
+				data: {
+					qr_code:
+						QR_CODE !== undefined
+							? {
+									url: QR_CODE.secure_url,
+									id: QR_CODE.public_id,
+							  }
+							: undefined,
+				},
+			});
+
+			return {
+				url: QR_CODE.secure_url,
+				id: QR_CODE.public_id,
+			};
+		} catch (error: any) {
+			if (error.code === "P2025")
+				throw new NotFoundError("URL does not exists");
+			throw new InternalServerError(error.message);
+		}
+	};
+
 	private isWithinSixMonths(date: Date) {
 		const currentDate = new Date();
 		const sixMonthsFromNow = new Date();
@@ -348,7 +377,6 @@ class UrlService {
 	};
 
 	private generateQRCode = async (url: string) => {
-		console.log(url);
 		const qr = await axios.get(
 			"http://api.qrserver.com/v1/create-qr-code",
 			{
@@ -362,7 +390,6 @@ class UrlService {
 				},
 			}
 		);
-		console.log(1);
 
 		const uploaded = await upload({
 			file: Buffer.from(qr.data),

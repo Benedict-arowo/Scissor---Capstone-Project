@@ -22,7 +22,7 @@ class UrlController {
 		});
 		return res
 			.status(StatusCodes.CREATED)
-			.json({ message: "Url Created.", data });
+			.json({ message: "Sucessfully created URL.", data });
 	});
 
 	public getMany = Wrapper(async (req: Request, res: Response) => {
@@ -34,12 +34,12 @@ class UrlController {
 		const data = await urlService.getMany(email, { page, limit });
 		redisClient.set(
 			getRedisKey(req),
-			JSON.stringify({ message: "success", data }),
+			JSON.stringify({ message: "Success", data }),
 			{
 				EX: 60 * 60 * 12, // 12 hours
 			}
 		);
-		return res.status(StatusCodes.OK).json({ message: "success", data });
+		return res.status(StatusCodes.OK).json({ message: "Success", data });
 	});
 
 	public getOne = Wrapper(async (req: Request, res: Response) => {
@@ -50,12 +50,12 @@ class UrlController {
 		const data = await urlService.getOne(email, url_id);
 		redisClient.set(
 			getRedisKey(req),
-			JSON.stringify({ message: "success", data }),
+			JSON.stringify({ message: "Success", data }),
 			{
 				EX: 60 * 60 * 12, // 12 hours
 			}
 		);
-		return res.status(StatusCodes.OK).json({ message: "success", data });
+		return res.status(StatusCodes.OK).json({ message: "Success", data });
 	});
 
 	public visit = Wrapper(async (req: Request, res: Response) => {
@@ -87,7 +87,16 @@ class UrlController {
 		}
 		return res
 			.status(StatusCodes.OK)
-			.json({ message: "success", data: data });
+			.json({ message: "Successfully updated URL.", data: data });
+	});
+
+	public generateQRCode = Wrapper(async (req: Request, res: Response) => {
+		const {
+			params: { id },
+			user: { email },
+		} = req as any;
+		const data = await urlService.QRCode(id, email);
+		return res.json({ message: "QRCode generated successfully", data });
 	});
 
 	public delete = Wrapper(async (req: Request, res: Response) => {
@@ -102,7 +111,7 @@ class UrlController {
 			redisClient.del(getRedisKey(req));
 			deleteKeysByPattern(`/url|+|${email}*`);
 		}
-		return res.status(StatusCodes.OK).json({ message: "success" });
+		return res.status(StatusCodes.NO_CONTENT).json({ message: "success" });
 	});
 }
 

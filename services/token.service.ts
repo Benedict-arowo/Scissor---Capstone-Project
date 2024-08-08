@@ -15,7 +15,6 @@ class TokenController {
 			},
 		});
 
-		// TODO: Review later, and make adjustments if needed (If user contains token, then use that to check instead of querying the db.)
 		if (token)
 			throw new BadrequestError("User already has an access token.");
 
@@ -49,7 +48,6 @@ class TokenController {
 
 			return 0;
 		} catch (error: any) {
-			console.log(error);
 			if (error.code === "P2025")
 				throw new NotFoundError("Token does not exist.");
 			return new InternalServerError(error.message);
