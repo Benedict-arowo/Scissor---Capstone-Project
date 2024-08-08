@@ -253,9 +253,13 @@ class UrlService {
 			const url = await URL.findUniqueOrThrow({
 				where: {
 					id,
-					owner_id: user_id,
 				},
 			});
+
+			if (url.owner_id && url.owner_id !== user_id)
+				throw new BadrequestError(
+					"You do not have permission to perform this action"
+				);
 
 			const QR_CODE = await this.generateQRCode(
 				config.BASE_URL + url.short_url
@@ -267,7 +271,6 @@ class UrlService {
 			await URL.update({
 				where: {
 					id,
-					owner_id: user_id,
 				},
 				data: {
 					qr_code:

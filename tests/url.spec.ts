@@ -10,6 +10,7 @@ describe("URL Routes", () => {
 	let user: User = {
 		access_token: undefined,
 		api_token: undefined,
+		email: undefined,
 		url: {
 			id: undefined,
 			short_url: undefined,
@@ -40,13 +41,19 @@ describe("URL Routes", () => {
 
 		user.access_token = authService["generateToken"]({ email });
 		user.api_token = token.token;
+		user.email = email;
 	});
 
 	afterAll(async () => {
+		await prisma.user.delete({
+			where: {
+				email: user.email,
+			},
+		});
 		await prisma.$disconnect();
 	});
 
-	describe("POST /api/url", () => {
+	describe("Create URL Route - /api/url", () => {
 		it("should create a new URL", async () => {
 			const response = await request(app)
 				.post("/api/url")
@@ -65,17 +72,12 @@ describe("URL Routes", () => {
 			user.url.id = response.body.data.id;
 			user.url.short_url = response.body.data.short_url;
 		});
-	});
 
-	describe("POST /api/url", () => {
 		it("should create a new URL with custom url", async () => {
 			const custom_url = faker.string.alphanumeric({
 				length: { min: 5, max: 7 },
 			});
-			console.log({
-				long_url: "https://example.com",
-				short_url: custom_url,
-			});
+
 			const response = await request(app)
 				.post("/api/url")
 				.set("Authorization", `Bearer ${user.access_token}`)
@@ -89,9 +91,7 @@ describe("URL Routes", () => {
 			expect(response.body.data).toHaveProperty("short_url", custom_url);
 			expect(response.body.data.owner_id).toBeDefined();
 		});
-	});
 
-	describe("POST /api/url", () => {
 		it("should create a new URL without being authenticated", async () => {
 			const response = await request(app).post("/api/url").send({
 				long_url: "https://example.com",
@@ -123,9 +123,7 @@ describe("URL Routes", () => {
 			expect(response.body).toHaveProperty("data");
 			expect(response.body.data).toHaveProperty("long_url");
 		});
-	});
 
-	describe("GET /api/url/:id", () => {
 		it("should return a single URL by ID using api-token", async () => {
 			const response = await request(app)
 				.get(`/api/url/${user.url.id}`)
@@ -153,9 +151,7 @@ describe("URL Routes", () => {
 				"https://newexample.com"
 			);
 		});
-	});
 
-	describe("PATCH /api/url/:id", () => {
 		it("should update a URL using api-token", async () => {
 			const response = await request(app)
 				.patch(`/api/url/${user.url.id}`)
@@ -206,9 +202,7 @@ describe("URL Routes", () => {
 
 			expect(response.status).toBe(401);
 		});
-	});
 
-	describe("DELETE /api/url/:id", () => {
 		it("should delete a URL", async () => {
 			const response = await request(app)
 				.delete(`/api/url/${user.url.id}`)
@@ -219,11 +213,12 @@ describe("URL Routes", () => {
 	});
 });
 
-interface User {
+export interface User {
 	access_token: string | undefined;
 	api_token: string | undefined;
 	url: {
 		id: string | undefined;
 		short_url: string | undefined;
 	};
+	email: string | undefined;
 }

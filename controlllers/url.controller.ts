@@ -30,7 +30,6 @@ class UrlController {
 			user: { email },
 			params: { page, limit },
 		} = req as any;
-		console.log(getRedisKey(req));
 		const data = await urlService.getMany(email, { page, limit });
 		redisClient.set(
 			getRedisKey(req),
@@ -60,7 +59,6 @@ class UrlController {
 
 	public visit = Wrapper(async (req: Request, res: Response) => {
 		const { id } = req.params;
-		console.log(req.url);
 		const parsed_user_agent = UAParser(req.headers["user-agent"]);
 
 		const data = await urlService.visit(id, {
