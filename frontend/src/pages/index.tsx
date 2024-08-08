@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { findFlagUrlByCountryName } from "country-flags-svg";
 import { Dialog } from "primereact/dialog";
+import linkedin from "../assets/icons/linkedin.svg";
+import github from "../assets/icons/github.svg";
+import email from "../assets/icons/email.svg";
 
 const API_URL = "http://localhost:5000";
 function Index() {
@@ -10,7 +13,26 @@ function Index() {
 		dialogVisible: false,
 		url: undefined,
 		prevUrl: undefined,
+		QRCode: undefined,
 	});
+
+	const generateQRCode = async (id: string) => {
+		const response = await fetch(API_URL + "/api" + id + "/qrcode", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+		});
+
+		if (!response.ok) {
+			throw new Error("Could not generate QRCode.");
+		}
+
+		setData((prev) => {
+			return {
+				...prev,
+				QRCode: response.data.QRCode,
+			};
+		});
+	};
 
 	const ShortenURL = async () => {
 		const fetchData = await fetch(API_URL + "/api/url", {
@@ -25,8 +47,10 @@ function Index() {
 		if (!fetchData.ok) {
 			return "Error";
 		}
+
 		const response = await fetchData.json();
-		const { short_url, long_url, qr_code } = response.data;
+		const { short_url, long_url } = response.data;
+
 		setData((prev) => ({
 			...prev,
 			url: `${API_URL}/${short_url}`,
@@ -252,7 +276,7 @@ function Index() {
 
 				<section className="mt-64 flex justify-center">
 					<section className="flex flex-row flex-wrap justify-center gap-20">
-						<div>
+						<div id="about">
 							<h3 className="font-bold text-3xl">
 								Link management
 							</h3>
@@ -294,9 +318,11 @@ function Index() {
 								style={{
 									transform: "translate(0.8rem, 1rem)",
 								}}></div>
-							{[1, 2, 3, 4, 5].map(() => (
+							{[1, 2, 3, 4, 5].map((i) => (
 								<div className="flex flex-row items-center justify-between w-[500px] bg-white px-4 py-3 rounded-lg shadow-md cursor-default z-10">
-									<div className="flex flex-col gap-0">
+									<div
+										key={i}
+										className="flex flex-col gap-0">
 										<p className="text-violet-600">
 											{domain}b5csx
 										</p>
@@ -553,26 +579,44 @@ function Index() {
 				</section>
 			</main>
 
-			<footer className="flex flex-col gap-2 mt-12 px-60">
+			<footer id="footer" className="flex flex-col gap-2 mt-12 px-60">
 				<section className="flex flex-row justify-between">
 					<div className="flex gap-16 flex-row flex-wrap ">
-						<a className="text-violet-600" href="/about">
+						<a className="text-violet-600" href="#about">
 							About
 						</a>
 						<a className="text-violet-600" href="#faq">
 							FAQ
 						</a>
-						<a className="text-violet-600" href="/contact">
+						<a className="text-violet-600" href="#footer">
 							Contact
 						</a>
-						<a className="text-violet-600" href="./report">
-							Report Malicious URL
-						</a>
 					</div>
-					<div className="flex flex-row gap-2">
-						<span>facebook</span>
-						<span>twitter</span>
-						<span>github</span>
+					<div className="flex flex-row gap-6">
+						<a href="">
+							<img
+								width={24}
+								height={24}
+								src={github}
+								alt="Visit my Github page."
+							/>
+						</a>
+						<a href="">
+							<img
+								width={24}
+								height={24}
+								src={linkedin}
+								alt="Visit my LinkedIn page."
+							/>
+						</a>
+						<a href="">
+							<img
+								width={24}
+								height={24}
+								src={email}
+								alt="Email me."
+							/>
+						</a>
 					</div>
 				</section>
 
@@ -616,4 +660,5 @@ interface IData {
 	dialogVisible: boolean;
 	url: undefined | string;
 	prevUrl: undefined | string;
+	QRCode: undefined | string;
 }
