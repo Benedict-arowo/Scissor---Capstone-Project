@@ -38,6 +38,20 @@ class TokenController {
 		return new_token;
 	};
 
+	public get = async (user_id: string) => {
+		const token = await Token.findUnique({
+			where: {
+				user_id,
+			},
+		});
+
+		if (!token) {
+			throw new NotFoundError("User has no token.");
+		}
+
+		return token;
+	};
+
 	public delete = async (user_id: string) => {
 		try {
 			await Token.delete({

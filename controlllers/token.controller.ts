@@ -14,6 +14,14 @@ class TokenController {
 			.json({ message: "Token Created.", data: token });
 	});
 
+	public get = Wrapper(async (req: Request, res: Response) => {
+		const {
+			user: { email },
+		} = req as any;
+		const data = await tokenService.get(email);
+		return res.status(StatusCodes.OK).json({ message: "Success", data });
+	});
+
 	public delete = Wrapper(async (req: Request, res: Response) => {
 		const {
 			user: { email },
