@@ -1,5 +1,5 @@
 import config from "../config";
-import {
+import ErrorParent, {
 	BadrequestError,
 	InternalServerError,
 	NotFoundError,
@@ -12,7 +12,7 @@ class AuthService {
 	public login = async (email: string, password: string) => {
 		try {
 			const user = await User.findUniqueOrThrow({ where: { email } });
-			console.log(user);
+			
 			if (!(await this.verifyPassword(user.password, password)))
 				throw new BadrequestError("Invalid password.");
 			delete (user as any).password;
@@ -22,6 +22,7 @@ class AuthService {
 			console.log(error);
 			if (error.code === "P2025")
 				throw new NotFoundError("User not found.");
+			if (error.code) throw new ErrorParent(error.message, error.code);
 			return new InternalServerError(error.message);
 		}
 	};
