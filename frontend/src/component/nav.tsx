@@ -1,12 +1,6 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Nav = () => {
-	const [mode, setMode] = useState("Login");
-	// setInterval(() => {
-	// 	setMode((prev) => (prev === "Login" ? "Register" : "Login"));
-	// }, 10000);
-
 	return (
 		<nav className="w-full bg-white  px-12 py-4 flex flex-row justify-between items-center">
 			<Link to="/">
@@ -15,9 +9,9 @@ const Nav = () => {
 
 			<div className="flex flex-row gap-3">
 				<Link
-					to={"/auth"}
+					to={"/auth?mode=login"}
 					className="py-1.5 px-5 border border-violet-600 text-violet-600 rounded-md font-medium hover:bg-violet-500 hover:text-white duration-300 transition-all w-fit">
-					{mode}
+					Login
 				</Link>
 
 				<Link

@@ -1,5 +1,4 @@
 import { findFlagUrlByCountryName } from "country-flags-svg";
-import React from "react";
 
 const home = () => {
 	return (

@@ -1,12 +1,109 @@
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Config from "../../utils";
+import { Toast } from "primereact/toast";
 
 const Token = () => {
-	const token = false;
 	const [visible, setVisibile] = useState<boolean>(true);
 	const [tokenVisible, setTokenVisible] = useState<boolean>(false);
+	const [err, setErr] = useState("");
+	const [token, setToken] = useState<IToken | null>(null);
+	const toast = useRef<Toast>(null);
 
+	const FetchToken = async () => {
+		const response = await fetch(`${Config.API_URL}/token`, {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+			},
+		});
+
+		if (response.status === 404) return;
+
+		if (!response.ok) {
+			const data = await response.json();
+			setErr(data.message);
+			throw new Error(data ? data.message : "Error fetching your token!");
+		}
+		const data = await response.json();
+		setToken(data.data);
+	};
+
+	const CreateToken = async (button: HTMLButtonElement) => {
+		toast.current?.show({
+			severity: "info",
+			summary: "Creating token...",
+		});
+		const response = await fetch(`${Config.API_URL}/token`, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+			},
+		});
+
+		if (!response.ok) {
+			const data = await response.json();
+			toast.current?.show({
+				severity: "error",
+				summary: "Error...",
+				detail: data ? data.message : "Error creating your token!",
+			});
+			setErr(data.message);
+			button.disabled = true;
+			throw new Error(data ? data.message : "Error creating your token!");
+		}
+
+		toast.current?.show({
+			severity: "success",
+			summary: "Success!",
+			detail: "Successfully created token!",
+		});
+		const data = await response.json();
+		setToken(data.data);
+	};
+
+	const DeleteToken = async (button: HTMLButtonElement) => {
+		toast.current?.show({
+			severity: "info",
+			summary: "Deleting token...",
+		});
+		const response = await fetch(`${Config.API_URL}/token`, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+			},
+		});
+
+		if (!response.ok) {
+			const data = await response.json();
+			toast.current?.show({
+				severity: "error",
+				summary: "Error...",
+				detail: data
+					? data.message
+					: "Error trying to delete your token!",
+			});
+			setErr(data.message);
+			button.disabled = true;
+			throw new Error(
+				data ? data.message : "Error trying to delete your token!"
+			);
+		}
+
+		toast.current?.show({
+			severity: "success",
+			summary: "Success!",
+			detail: "Successfully deleted token!",
+		});
+
+		setToken(null);
+	};
+
+	useEffect(() => {
+		FetchToken();
+	}, []);
 	return (
 		<div className="m-8">
+			<Toast ref={toast} />
 			<header className="flex flex-col gap-1 mb-12">
 				<h3 className="font-semibold text-2xl">
 					User Token{" "}
@@ -24,22 +121,30 @@ const Token = () => {
 				)}
 			</header>
 
+			{err && err}
+
 			{!token && (
-				<button className="px-4 w-fit bg-violet-600 py-2 text-white rounded-lg">
+				<button
+					onClick={(e) => CreateToken(e.currentTarget)}
+					className="px-4 w-fit bg-violet-600 py-2 text-white rounded-lg">
 					Create Token
 				</button>
 			)}
 			{token && (
-				<div className="max-w-[600px]">
+				<div className="max-w-[800px]">
 					<div className="border border-gray-300 focus:outline-none focus:border-violet-600 transition duration-300 w-full focus:drop-shadow-md rounded-md flex flex-row items-center px-2 overflow-hidden">
 						<input
-							className="py-2 pl-2 outline-none w-full "
+							className="py-2 pl-2 outline-none w-full"
 							type={tokenVisible === true ? "text" : "password"}
 							name="alias"
 							id="alias"
 							minLength={5}
 							maxLength={8}
-							value={"secret token"}
+							value={
+								tokenVisible
+									? token.token
+									: "why are you peaking :eyes:"
+							}
 							disabled
 						/>
 						<span
@@ -51,8 +156,9 @@ const Token = () => {
 							{!tokenVisible && <i className="pi pi-eye"></i>}
 						</span>
 					</div>
-					{/* Make it toggleable via an icon:) */}
-					<button className="px-4 w-fit bg-red-500 py-2 text-white rounded-lg mt-5">
+					<button
+						onClick={(e) => DeleteToken(e.currentTarget)}
+						className="px-4 w-fit bg-red-500 py-2 text-white rounded-lg mt-5">
 						Delete Token
 					</button>
 				</div>
@@ -62,3 +168,9 @@ const Token = () => {
 };
 
 export default Token;
+
+interface IToken {
+	token: string;
+	expiration_date: Date;
+	last_used: Date | undefined;
+}
