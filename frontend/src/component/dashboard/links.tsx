@@ -317,7 +317,7 @@ pi-arrow-up"></i>
 };
 
 export default Links;
-interface IURL {
+export interface IURL {
 	id: string;
 	short_url: string;
 	long_url: string;
