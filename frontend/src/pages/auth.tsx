@@ -132,7 +132,7 @@ const Auth = () => {
 						<i className="pi pi-key"></i>
 						<input
 							className="py-3 border-none outline-none w-full"
-							placeholder="http://www.example.com/something?cool=true"
+							placeholder="*********"
 							type="password"
 							name="password"
 							id="password"
