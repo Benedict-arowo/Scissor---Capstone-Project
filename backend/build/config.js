@@ -3,13 +3,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv").config({ path: "./.env" });
 const config = {
     ROUTE_PREFIX: "api",
-    BASE_URL: "https://localhost.com/",
-    NODE_ENV: "development",
+    BASE_URL: "http://arowobenedict.tech/",
+    NODE_ENV: "production",
     PORT: parseInt(process.env.PORT) || 5000,
     JWT_SECERET: process.env.JWT_SECERET,
+    REDIS: {
+        HOST: process.env.REDIS_HOST,
+        PORT: parseInt(process.env.REDIS_PORT),
+        PASSWORD: process.env.REDIS_PASSWORD,
+    },
     OPTIONS: {
-        SCAN_URLS: false,
-        UPDATE_USER_IP_INFO: false,
+        SCAN_URLS: true,
+        UPDATE_USER_IP_INFO: true,
         TOKEN_EXPIRY_DAYS: 7,
         TOKEN_LENGTH: 32,
     },
