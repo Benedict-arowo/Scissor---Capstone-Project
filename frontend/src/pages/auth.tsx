@@ -1,9 +1,11 @@
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useContext, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Config from "../utils";
 import { Toast } from "primereact/toast";
+import AuthContext from "../context/Auth";
 
 const Auth = () => {
+	const UseAuth = useContext(AuthContext);
 	const toast = useRef<Toast>(null);
 	const { search } = useLocation();
 	const Navigate = useNavigate();
@@ -19,7 +21,19 @@ const Auth = () => {
 
 	const Authenticate = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		UseAuth?.logout();
+
+		toast.current?.show({
+			severity: "info",
+			summary: mode === "login" ? "Logging in..." : "Registering...",
+		});
+
 		if (!credentials.email || !credentials.password) {
+			toast.current?.show({
+				severity: "error",
+				summary: "Error",
+				detail: "Please fill in all the fields!",
+			});
 			throw new Error("Please fill in all the fields!");
 		}
 
@@ -51,7 +65,7 @@ const Auth = () => {
 				detail: "Successful registration!",
 			});
 			// Display signup successfull
-			setMode("login");
+			return setMode("login");
 		}
 
 		toast.current?.show({
@@ -59,10 +73,12 @@ const Auth = () => {
 			summary: "Success",
 			detail: "Successfully logged you in!",
 		});
-		const {
-			data: { access_token },
-		} = data;
-		localStorage.setItem("access_token", access_token);
+
+		console.log(data);
+
+		UseAuth?.login({
+			token: data.data.access_token,
+		});
 		setTimeout(() => {
 			Navigate("/dashboard");
 		}, 1000);

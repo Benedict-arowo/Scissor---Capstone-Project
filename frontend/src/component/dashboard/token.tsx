@@ -1,32 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import Config from "../../utils";
 import { Toast } from "primereact/toast";
 
-const Token = () => {
+const Token = ({
+	token,
+	setToken,
+}: {
+	token: IToken | null;
+	setToken: Dispatch<SetStateAction<IToken | null>>;
+}) => {
 	const [visible, setVisibile] = useState<boolean>(true);
 	const [tokenVisible, setTokenVisible] = useState<boolean>(false);
 	const [err, setErr] = useState("");
-	const [token, setToken] = useState<IToken | null>(null);
 	const toast = useRef<Toast>(null);
-
-	const FetchToken = async () => {
-		const response = await fetch(`${Config.API_URL}/token`, {
-			method: "GET",
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-			},
-		});
-
-		if (response.status === 404) return;
-
-		if (!response.ok) {
-			const data = await response.json();
-			setErr(data.message);
-			throw new Error(data ? data.message : "Error fetching your token!");
-		}
-		const data = await response.json();
-		setToken(data.data);
-	};
 
 	const CreateToken = async (button: HTMLButtonElement) => {
 		toast.current?.show({
@@ -98,9 +84,6 @@ const Token = () => {
 		setToken(null);
 	};
 
-	useEffect(() => {
-		FetchToken();
-	}, []);
 	return (
 		<div className="m-8">
 			<Toast ref={toast} />
@@ -169,7 +152,7 @@ const Token = () => {
 
 export default Token;
 
-interface IToken {
+export interface IToken {
 	token: string;
 	expiration_date: Date;
 	last_used: Date | undefined;

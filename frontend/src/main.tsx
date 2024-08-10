@@ -5,12 +5,16 @@ import "./index.css";
 import { PrimeReactProvider } from "primereact/api";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "./context/Auth.tsx";
+import "primereact/resources/themes/lara-light-blue/theme.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
 	<React.StrictMode>
 		<PrimeReactProvider>
 			<BrowserRouter>
-				<App />
+				<AuthProvider>
+					<App />
+				</AuthProvider>
 			</BrowserRouter>
 		</PrimeReactProvider>
 	</React.StrictMode>

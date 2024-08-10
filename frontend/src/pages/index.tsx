@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { findFlagUrlByCountryName } from "country-flags-svg";
 import { Dialog } from "primereact/dialog";
 import linkedin from "../assets/icons/linkedin.svg";
 import github from "../assets/icons/github.svg";
 import email from "../assets/icons/email.svg";
+import Config from "../utils";
+import { Toast } from "primereact/toast";
 
-const API_URL = "http://localhost:5000";
+// const API_URL = "http://localhost:5000";
 function Index() {
 	const [data, setData] = useState<IData>({
 		longUrl: "",
@@ -15,27 +17,28 @@ function Index() {
 		prevUrl: undefined,
 		QRCode: undefined,
 	});
+	const toast = useRef<Toast>(null);
 
-	const generateQRCode = async (id: string) => {
-		const response = await fetch(API_URL + "/api" + id + "/qrcode", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-		});
+	// const generateQRCode = async (id: string) => {
+	// 	const response = await fetch(API_URL + "/api" + id + "/qrcode", {
+	// 		method: "POST",
+	// 		headers: { "Content-Type": "application/json" },
+	// 	});
 
-		if (!response.ok) {
-			throw new Error("Could not generate QRCode.");
-		}
+	// 	if (!response.ok) {
+	// 		throw new Error("Could not generate QRCode.");
+	// 	}
 
-		setData((prev) => {
-			return {
-				...prev,
-				QRCode: response.data.QRCode,
-			};
-		});
-	};
+	// 	setData((prev) => {
+	// 		return {
+	// 			...prev,
+	// 			QRCode: response.data.QRCode,
+	// 		};
+	// 	});
+	// };
 
 	const ShortenURL = async () => {
-		const fetchData = await fetch(API_URL + "/api/url", {
+		const fetchData = await fetch(Config.API_URL + "/url", {
 			method: "POST",
 			body: JSON.stringify({
 				long_url: data.longUrl,
@@ -45,7 +48,15 @@ function Index() {
 		});
 
 		if (!fetchData.ok) {
-			return "Error";
+			const data = await fetchData.json();
+			console.log(data);
+
+			toast.current?.show({
+				severity: "error",
+				summary: "Error",
+				detail: data ? data.message : "Failed to authenticate!",
+			});
+			throw new Error(data ? data.message : "Failed to authenticate!");
 		}
 
 		const response = await fetchData.json();
@@ -53,13 +64,13 @@ function Index() {
 
 		setData((prev) => ({
 			...prev,
-			url: `${API_URL}/${short_url}`,
+			url: `${Config.BASE_URL}/${short_url}`,
 			prevUrl: long_url,
 			dialogVisible: true,
 		}));
 	};
 
-	const domain = "www.scissor/";
+	// const domain = "www.scissor/";
 	const countries = [
 		"United States",
 		"Canada",
@@ -118,6 +129,7 @@ function Index() {
 
 	return (
 		<div className="h-full bg-white pb-12">
+			<Toast ref={toast} />
 			<main className="h-full min-h-screen">
 				<section className="pt-36 flex flex-col items-center">
 					<h1 className="text-5xl font-bold text-center">
@@ -248,7 +260,7 @@ function Index() {
 									name="domain"
 									id="domain"
 									disabled
-									value={domain}
+									value={Config.BASE_URL}
 								/>
 							</fieldset>
 
@@ -324,7 +336,7 @@ function Index() {
 										key={i}
 										className="flex flex-col gap-0">
 										<p className="text-violet-600">
-											{domain}b5csx
+											{Config.BASE_URL}/b5csx
 										</p>
 										<span className="text-gray-500">
 											Cibsectetur - Adipiscing

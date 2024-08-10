@@ -11,6 +11,7 @@ const cors_1 = __importDefault(require("cors"));
 const error_handler_middlewear_1 = __importDefault(require("./middlewears/error_handler.middlewear"));
 const app = (0, express_1.default)();
 app.use((0, morgan_1.default)("dev"));
+app.set("trust proxy", 1);
 app.set("view engine", "pug");
 app.use((0, cors_1.default)(config_1.default.CORS_OPTION));
 app.use(express_1.default.json());

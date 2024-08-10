@@ -70,7 +70,8 @@ class UrlController {
         this.visit = (0, wrapper_1.default)((req, res) => __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const parsed_user_agent = (0, ua_parser_js_1.default)(req.headers["user-agent"]);
-            const data = yield url_service_1.default.visit(id, Object.assign(Object.assign({}, parsed_user_agent), { ip: req.ip }));
+            console.log(req.headers["x-forwarded-for"], req.ip);
+            const data = yield url_service_1.default.visit(id, Object.assign(Object.assign({}, parsed_user_agent), { ip: req.headers["x-forwarded-for"] || req.ip }));
             return res.render("redirect", { url: data.url, is_safe: data.is_safe });
         }));
         this.update = (0, wrapper_1.default)((req, res) => __awaiter(this, void 0, void 0, function* () {

@@ -1,57 +1,69 @@
 import { findFlagUrlByCountryName } from "country-flags-svg";
-import Config from "../../utils";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { IURL } from "./links";
+import { format } from "timeago.js";
+import Config from "../../utils";
 
-const Home = () => {
-	const [items, setItems] = useState<IURL[]>([]);
-	const [err, setErr] = useState<undefined | string>(undefined);
+const Home = (props: IPROPS) => {
+	const { items } = props;
+	const [stats, setStats] = useState<{
+		clicks: number | undefined;
+		countries: undefined | { [key: string]: number };
+	}>({
+		clicks: undefined,
+		countries: undefined,
+	});
 
-	const FetchLinks = async () => {
-		const response = await fetch(`${Config.API_URL}/url`, {
-			method: "GET",
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-			},
+	const getClicks = () => {
+		let clicks = 0;
+		const countries: { [key: string]: number } = {};
+
+		items.forEach((item) => {
+			item.clicks.forEach((click) => {
+				if (click.country) {
+					if (countries[click.country]) {
+						countries[click.country]++;
+					} else {
+						countries[click.country] = 1;
+					}
+				}
+				clicks++;
+			});
 		});
 
-		if (!response.ok) {
-			const data = await response.json();
-
-			setErr(data.message);
-			throw new Error(data ? data.message : "Error fetching your urls!");
-		}
-
-		const data = await response.json();
-
-		setItems(() =>
-			data.data.map((item) => ({ ...item, isCollapsed: true }))
-		);
+		setStats({ clicks, countries });
 	};
 
 	useEffect(() => {
-		FetchLinks();
-	}, []);
+		getClicks();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [items]);
 
 	return (
 		<div className="m-8 max-w-full overflow-hidden">
 			<header className="w-full flex h-[130px] flex-row gap-8 justify-center">
 				<div className="w-full h-full rounded-md bg-violet-600 flex flex-col justify-between p-4 border border-gray-500 shadow-md">
-					<p className="text-6xl font-light text-white">300</p>
+					<p className="text-6xl font-light text-white">
+						{items.length}
+					</p>
 					<p className="self-end place-self-end text-5xl font-bold">
 						URLS
 					</p>
 				</div>
 
 				<div className="w-full h-full rounded-md bg-green-600 flex flex-col justify-between p-4 border border-gray-500 shadow-md">
-					<p className="text-6xl font-light text-white">300</p>
+					<p className="text-6xl font-light text-white">
+						{stats.clicks}
+					</p>
 					<p className="self-end place-self-end text-5xl font-bold">
 						CLICKS
 					</p>
 				</div>
 
 				<div className="w-full h-full rounded-md bg-yellow-600 flex flex-col justify-between p-4 border border-gray-500 shadow-md">
-					<p className="text-6xl font-light text-white">30+</p>
+					<p className="text-6xl font-light text-white">
+						{stats.countries && Object.keys(stats.countries).length}
+					</p>
 					<p className="self-end place-self-end text-5xl font-bold">
 						COUNTRIES
 					</p>
@@ -64,51 +76,27 @@ const Home = () => {
 						Top Urls
 					</h3>
 					<ul className="flex flex-col gap-2 px-3">
-						<li className="flex flex-row justify-between">
-							<a href="" className="underline">
-								/uggbu1
-							</a>
-							<p className="font-light">300 Clicks</p>
-							<p className="text-gray-400 font-light text-sm">
-								30 days ago
-							</p>
-						</li>{" "}
-						<li className="flex flex-row justify-between">
-							<a href="" className="underline">
-								/uggbu1
-							</a>
-							<p className="font-light">300 Clicks</p>
-							<p className="text-gray-400 font-light text-sm">
-								30 days ago
-							</p>
-						</li>
-						<li className="flex flex-row justify-between">
-							<a href="" className="underline">
-								/uggbu1
-							</a>
-							<p className="font-light">300 Clicks</p>
-							<p className="text-gray-400 font-light text-sm">
-								30 days ago
-							</p>
-						</li>
-						<li className="flex flex-row justify-between">
-							<a href="" className="underline">
-								/uggbu1
-							</a>
-							<p className="font-light">300 Clicks</p>
-							<p className="text-gray-400 font-light text-sm">
-								30 days ago
-							</p>
-						</li>
-						<li className="flex flex-row justify-between">
-							<a href="" className="underline">
-								/uggbu1
-							</a>
-							<p className="font-light">300 Clicks</p>
-							<p className="text-gray-400 font-light text-sm">
-								30 days ago
-							</p>
-						</li>
+						{items
+							.sort((a, b) => b.clicks.length - a.clicks.length)
+							.map((item) => {
+								return (
+									<li
+										key={item.id}
+										className="flex flex-row justify-between">
+										<a
+											href={`${Config.BASE_URL}/${item.short_url}`}
+											className="underline">
+											/{item.short_url}
+										</a>
+										<p className="font-light">
+											{item.clicks.length} Clicks
+										</p>
+										<p className="text-gray-400 font-light text-sm">
+											{format(item.created_at)}
+										</p>
+									</li>
+								);
+							})}{" "}
 					</ul>
 				</section>
 
@@ -180,3 +168,8 @@ const Home = () => {
 };
 
 export default Home;
+
+export interface IPROPS {
+	items: IURL[];
+	setItems: Dispatch<SetStateAction<IURL[]>>;
+}
