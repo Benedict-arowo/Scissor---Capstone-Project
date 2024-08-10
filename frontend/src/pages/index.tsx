@@ -605,7 +605,9 @@ function Index() {
 						</a>
 					</div>
 					<div className="flex flex-row gap-6">
-						<a href="">
+						<a
+							href="https://github.com/Benedict-arowo"
+							target="_blank">
 							<img
 								width={24}
 								height={24}
@@ -613,7 +615,9 @@ function Index() {
 								alt="Visit my Github page."
 							/>
 						</a>
-						<a href="">
+						<a
+							href="https://www.linkedin.com/in/benedict-arowo/"
+							target="_blank">
 							<img
 								width={24}
 								height={24}
@@ -621,7 +625,7 @@ function Index() {
 								alt="Visit my LinkedIn page."
 							/>
 						</a>
-						<a href="">
+						<a href="mailto:benedict.arowo@gmail.com">
 							<img
 								width={24}
 								height={24}
@@ -633,7 +637,7 @@ function Index() {
 				</section>
 
 				<p className="text-gray-500 mt-4">
-					© 2023 Scissor. All rights reserved.
+					© 2024 Scissor. All rights reserved.
 				</p>
 			</footer>
 
