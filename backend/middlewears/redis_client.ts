@@ -10,14 +10,6 @@ const redisClient = createClient({
 	},
 });
 
-console.log({
-	password: config.REDIS.PASSWORD,
-	socket: {
-		host: config.REDIS.HOST,
-		port: config.REDIS.PORT,
-	},
-});
-
 redisClient.on("error", (err: any) => console.error("Redis Client Error", err));
 
 redisClient.connect();
