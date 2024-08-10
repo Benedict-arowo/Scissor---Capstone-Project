@@ -60,10 +60,10 @@ class UrlController {
 	public visit = Wrapper(async (req: Request, res: Response) => {
 		const { id } = req.params;
 		const parsed_user_agent = UAParser(req.headers["user-agent"]);
-
+		console.log(req.headers["user-agent"], req.ip);
 		const data = await urlService.visit(id, {
 			...parsed_user_agent,
-			ip: req.ip,
+			ip: req.headers["x-forwarded-for"] || req.ip,
 		});
 
 		return res.render("redirect", { url: data.url, is_safe: data.is_safe });
