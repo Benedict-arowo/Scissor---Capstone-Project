@@ -4,8 +4,8 @@ info:
     description: API for managing URL shortening, QR code generation, and URL information.
     version: 1.0.0
 servers:
-    - url: http://localhost:3000/api
-      description: Local server
+    - url: http://arowobenedict.tech/api
+      description: Production Server
 
 tags:
     - name: Main

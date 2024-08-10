@@ -6,7 +6,11 @@ const config: Iconfig = {
 	NODE_ENV: "production",
 	PORT: parseInt(process.env.PORT as string) || 5000,
 	JWT_SECERET: process.env.JWT_SECERET as string,
-	REDIS_URI: process.env.REDIS_URI as string,
+	REDIS: {
+		HOST: process.env.REDIS_HOST as string,
+		PORT: parseInt(process.env.REDIS_PORT as string),
+		PASSWORD: process.env.REDIS_PASSWORD as string,
+	},
 	OPTIONS: {
 		SCAN_URLS: true,
 		UPDATE_USER_IP_INFO: true,
@@ -44,7 +48,11 @@ interface Iconfig {
 	NODE_ENV: "development" | "production";
 	PORT: number;
 	JWT_SECERET: string;
-	REDIS_URI: string;
+	REDIS: {
+		HOST: string;
+		PORT: number;
+		PASSWORD: string;
+	};
 	OPTIONS: {
 		SCAN_URLS: boolean;
 		UPDATE_USER_IP_INFO: boolean;
