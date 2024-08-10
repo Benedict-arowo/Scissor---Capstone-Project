@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { findFlagUrlByCountryName } from "country-flags-svg";
 import { Dialog } from "primereact/dialog";
 import linkedin from "../assets/icons/linkedin.svg";
@@ -6,9 +6,11 @@ import github from "../assets/icons/github.svg";
 import email from "../assets/icons/email.svg";
 import Config from "../utils";
 import { Toast } from "primereact/toast";
+import AuthContext from "../context/Auth";
 
 // const API_URL = "http://localhost:5000";
 function Index() {
+	const UserContext = useContext(AuthContext);
 	const [data, setData] = useState<IData>({
 		longUrl: "",
 		shortUrl: "",
@@ -44,7 +46,12 @@ function Index() {
 				long_url: data.longUrl,
 				short_url: data.shortUrl,
 			}),
-			headers: { "Content-Type": "application/json" },
+			headers: {
+				Authorization: UserContext?.user
+					? `Bearer ${localStorage.getItem("access_token")}`
+					: "",
+				"Content-Type": "application/json",
+			},
 		});
 
 		if (!fetchData.ok) {
@@ -70,7 +77,6 @@ function Index() {
 		}));
 	};
 
-	// const domain = "www.scissor/";
 	const countries = [
 		"United States",
 		"Canada",
