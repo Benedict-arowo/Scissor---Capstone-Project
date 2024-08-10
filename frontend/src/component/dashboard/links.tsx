@@ -62,7 +62,7 @@ const Links = (props: IPROPS) => {
 			method: "POST",
 			body: JSON.stringify({
 				long_url: data.longUrl,
-				short_url: data.shortUrl,
+				short_url: data.shortUrl.length > 0 ? data.shortUrl : undefined,
 				expiration_date: data.expirationDate
 					? data.expirationDate
 					: undefined,

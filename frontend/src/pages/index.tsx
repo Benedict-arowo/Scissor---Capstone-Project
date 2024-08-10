@@ -44,7 +44,8 @@ function Index() {
 			method: "POST",
 			body: JSON.stringify({
 				long_url: data.longUrl,
-				short_url: data.shortUrl,
+				short_url:
+					data.shortUrl.length === 0 ? undefined : data.shortUrl,
 			}),
 			headers: {
 				Authorization: UserContext?.user
@@ -56,7 +57,6 @@ function Index() {
 
 		if (!fetchData.ok) {
 			const data = await fetchData.json();
-			console.log(data);
 
 			toast.current?.show({
 				severity: "error",
