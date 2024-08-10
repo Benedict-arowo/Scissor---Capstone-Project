@@ -17,7 +17,7 @@ const routelist = <
 
 export const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
-	limit: 200, // Limit each IP to 200 requests per per 15 minutes.
+	limit: 500, // Limit each IP to 500 requests per per 15 minutes.
 	standardHeaders: "draft-7",
 	legacyHeaders: false,
 });
