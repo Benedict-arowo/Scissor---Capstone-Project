@@ -61,7 +61,11 @@ function Index() {
 			toast.current?.show({
 				severity: "error",
 				summary: "Error",
-				detail: data ? data.message : "Failed to authenticate!",
+				detail: data
+					? fetchData.status === 422
+						? data.errors[0].message
+						: data.message
+					: "Failed to shorten URL!",
 			});
 			throw new Error(data ? data.message : "Failed to authenticate!");
 		}
