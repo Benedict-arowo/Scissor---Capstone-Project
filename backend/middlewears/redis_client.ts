@@ -1,7 +1,10 @@
 import { Request } from "express";
 import { createClient } from "redis";
+import config from "../config";
 
-const redisClient = createClient();
+const redisClient = createClient({
+	url: config.REDIS_URI,
+});
 
 redisClient.on("error", (err: any) => console.error("Redis Client Error", err));
 
