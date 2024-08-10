@@ -75,8 +75,6 @@ const Links = (props: IPROPS) => {
 
 		if (!fetchData.ok) {
 			const data = await fetchData.json();
-			console.log(data);
-			console.log(fetchData.status);
 			toast.current?.show({
 				severity: "error",
 				summary: "Error",

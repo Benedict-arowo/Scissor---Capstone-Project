@@ -96,7 +96,6 @@ const Dashboard = () => {
 	};
 
 	useEffect(() => {
-		console.log(UseAuth);
 		if (!UseAuth?.loading && !UseAuth?.user) Navigate("/auth");
 		FetchLinks();
 		FetchToken();

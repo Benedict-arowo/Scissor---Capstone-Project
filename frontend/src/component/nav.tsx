@@ -5,7 +5,6 @@ import AuthContext from "../context/Auth";
 const Nav = () => {
 	const UseAuth = useContext(AuthContext);
 	const location = useLocation();
-	console.log(location);
 	return (
 		<nav className="w-full bg-white  px-12 py-4 flex flex-row justify-between items-center">
 			<Link to="/">

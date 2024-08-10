@@ -30,7 +30,7 @@ const Home = (props: IPROPS) => {
 				clicks++;
 			});
 		});
-
+		console.log(countries);
 		setStats({ clicks, countries });
 	};
 
@@ -105,61 +105,31 @@ const Home = (props: IPROPS) => {
 						Top Countries
 					</h3>
 					<ul className="flex flex-col gap-2 px-3">
-						<li className="flex flex-row justify-between">
-							<div className="flex flex-row gap-2">
-								<img
-									src={findFlagUrlByCountryName("Nigeria")}
-									alt=""
-									width={40}
-								/>
-								<h6>Nigeria</h6>
-							</div>
-							<p>35</p>
-						</li>
-						<li className="flex flex-row justify-between">
-							<div className="flex flex-row gap-2">
-								<img
-									src={findFlagUrlByCountryName("Sudan")}
-									alt=""
-									width={40}
-								/>
-								<h6>Sudan</h6>
-							</div>
-							<p>35</p>
-						</li>
-						<li className="flex flex-row justify-between">
-							<div className="flex flex-row gap-2">
-								<img
-									src={findFlagUrlByCountryName("Sudan")}
-									alt=""
-									width={40}
-								/>
-								<h6>Sudan</h6>
-							</div>
-							<p>35</p>
-						</li>
-						<li className="flex flex-row justify-between">
-							<div className="flex flex-row gap-2">
-								<img
-									src={findFlagUrlByCountryName("Sudan")}
-									alt=""
-									width={40}
-								/>
-								<h6>Sudan</h6>
-							</div>
-							<p>35</p>
-						</li>
-						<li className="flex flex-row justify-between">
-							<div className="flex flex-row gap-2">
-								<img
-									src={findFlagUrlByCountryName("Sudan")}
-									alt=""
-									width={40}
-								/>
-								<h6>Sudan</h6>
-							</div>
-							<p>35</p>
-						</li>
+						{stats.countries &&
+							Object.keys(stats.countries)
+								.slice(0, 5)
+								.map((country) => {
+									return (
+										<li className="flex flex-row justify-between">
+											<div className="flex flex-row gap-2">
+												<img
+													src={findFlagUrlByCountryName(
+														country
+													)}
+													alt=""
+													width={40}
+												/>
+												<h6 className="capitalize">
+													{country}
+												</h6>
+											</div>
+											<p>
+												{stats.countries &&
+													stats.countries[country]}
+											</p>
+										</li>
+									);
+								})}
 					</ul>
 				</section>
 			</main>
