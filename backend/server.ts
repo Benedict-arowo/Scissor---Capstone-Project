@@ -9,7 +9,7 @@ const app = express();
 app.use(morgan("dev"));
 app.set("trust proxy", 1);
 app.set("view engine", "pug");
-app.use(cors(config.CORS_OPTION));
+app.use(cors());
 app.use(express.json());
 Routes(app);
 app.use(ErrorHandler);
