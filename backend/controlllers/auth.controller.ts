@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import authService from "../../services/auth.service";
+import authService from "../services/auth.service";
 import Wrapper from "../middlewears/wrapper";
 import validator from "../middlewears/validators";
 import { AuthSchema } from "../middlewears/validators/auth.validator";

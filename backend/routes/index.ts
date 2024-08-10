@@ -2,7 +2,7 @@ import path from "path";
 import config from "../config";
 import fs from "fs";
 import { Express, Router } from "express";
-import urlController from "../backend/controlllers/url.controller";
+import urlController from "../controlllers/url.controller";
 import rateLimit from "express-rate-limit";
 import Cache from "../middlewears/cache";
 

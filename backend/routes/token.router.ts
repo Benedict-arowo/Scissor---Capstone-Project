@@ -1,5 +1,5 @@
 import express from "express";
-import tokenController from "../backend/controlllers/token.controller";
+import tokenController from "../controlllers/token.controller";
 import { AuthenticatedOnly } from "../middlewears/authenticated";
 import { limiter } from ".";
 const Router = express.Router();
