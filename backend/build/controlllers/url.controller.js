@@ -47,6 +47,8 @@ class UrlController {
         this.create = (0, wrapper_1.default)((req, res) => __awaiter(this, void 0, void 0, function* () {
             (0, validators_1.default)(url_validator_1.CreateURLSchema, req.body);
             const data = yield url_service_1.default.create(Object.assign(Object.assign({}, req.body), { user_id: req.user ? req.user.email : undefined }));
+            if (req.user)
+                (0, redis_client_1.deleteKeysByPattern)(`/url|+|${req.user.email}*`);
             return res
                 .status(http_status_codes_1.StatusCodes.CREATED)
                 .json({ message: "Sucessfully created URL.", data });
@@ -55,7 +57,7 @@ class UrlController {
             const { user: { email }, params: { page, limit }, } = req;
             const data = yield url_service_1.default.getMany(email, { page, limit });
             redis_client_1.default.set((0, redis_client_1.getRedisKey)(req), JSON.stringify({ message: "Success", data }), {
-                EX: 60 * 5, // 5 minutes
+                EX: 60 * 60 * 12, // 12 hours
             });
             return res.status(http_status_codes_1.StatusCodes.OK).json({ message: "Success", data });
         }));
@@ -63,15 +65,18 @@ class UrlController {
             const { user: { email }, params: { id: url_id }, } = req;
             const data = yield url_service_1.default.getOne(email, url_id);
             redis_client_1.default.set((0, redis_client_1.getRedisKey)(req), JSON.stringify({ message: "Success", data }), {
-                EX: 60 * 5, // 5 minutes
+                EX: 60 * 60 * 12, // 12 hours
             });
             return res.status(http_status_codes_1.StatusCodes.OK).json({ message: "Success", data });
         }));
         this.visit = (0, wrapper_1.default)((req, res) => __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const parsed_user_agent = (0, ua_parser_js_1.default)(req.headers["user-agent"]);
-            console.log(req.headers["x-forwarded-for"], req.ip);
             const data = yield url_service_1.default.visit(id, Object.assign(Object.assign({}, parsed_user_agent), { ip: req.headers["x-forwarded-for"] || req.ip }));
+            // If the URL has an owner, it means the analytics is being tracked, hence we need to make sure the cached data is up to date.
+            if (data.email) {
+                (0, redis_client_1.deleteKeysByPattern)(`/url|+|${data.email}*`);
+            }
             return res.render("redirect", { url: data.url, is_safe: data.is_safe });
         }));
         this.update = (0, wrapper_1.default)((req, res) => __awaiter(this, void 0, void 0, function* () {

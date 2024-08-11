@@ -8,27 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteKeysByPattern = exports.getRedisKey = void 0;
 const redis_1 = require("redis");
-const config_1 = __importDefault(require("../config"));
-const redisClient = (0, redis_1.createClient)({
-    password: config_1.default.REDIS.PASSWORD,
-    socket: {
-        host: config_1.default.REDIS.HOST,
-        port: config_1.default.REDIS.PORT,
-    },
-});
-console.log({
-    password: config_1.default.REDIS.PASSWORD,
-    socket: {
-        host: config_1.default.REDIS.HOST,
-        port: config_1.default.REDIS.PORT,
-    },
-});
+const redisClient = (0, redis_1.createClient)();
+// const redisClient = createClient({
+// 	password: config.REDIS.PASSWORD,
+// 	socket: {
+// 		host: config.REDIS.HOST,
+// 		port: config.REDIS.PORT,
+// 	},
+// });
 redisClient.on("error", (err) => console.error("Redis Client Error", err));
 redisClient.connect();
 const getRedisKey = (req) => {

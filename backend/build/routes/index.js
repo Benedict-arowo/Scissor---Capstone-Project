@@ -13,7 +13,7 @@ const cache_1 = __importDefault(require("../middlewears/cache"));
 const routelist = [];
 exports.limiter = (0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    limit: 50, // Limit each IP to 50 requests per `window` (here, per 15 minutes).
+    limit: 500, // Limit each IP to 500 requests per per 15 minutes.
     standardHeaders: "draft-7",
     legacyHeaders: false,
 });

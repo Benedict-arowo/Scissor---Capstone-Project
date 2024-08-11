@@ -17,6 +17,14 @@ const error_1 = require("../middlewears/error");
 const axios_1 = __importDefault(require("axios"));
 const config_1 = __importDefault(require("../config"));
 const cloudinary_uploader_1 = require("../middlewears/cloudinary_uploader");
+const bull_1 = __importDefault(require("bull"));
+const myQueue = new bull_1.default("main", {
+    redis: {
+        host: config_1.default.REDIS.HOST,
+        port: config_1.default.REDIS.PORT,
+        password: config_1.default.REDIS.PASSWORD,
+    },
+});
 class UrlService {
     constructor() {
         /**
@@ -26,8 +34,8 @@ class UrlService {
          * @throws BadrequestError if the URL is invalid, the short URL is already taken, or the expiration date is not within 6 months.
          */
         this.create = (data) => __awaiter(this, void 0, void 0, function* () {
-            if (!this.isValidURL(data.long_url))
-                throw new error_1.BadrequestError("Invalid URL provided.");
+            // if (!this.isValidURL(data.long_url))
+            // 	throw new BadrequestError("Invalid URL provided.");
             let valid_short_url = false;
             do {
                 if (!data.short_url) {
@@ -66,10 +74,18 @@ class UrlService {
                     owner_id: data.user_id && data.user_id,
                 },
             });
-            // TODO: QR Code generation to be handled by background workers
-            // TODO: Let workers handle this
-            if (config_1.default.OPTIONS.SCAN_URLS)
-                yield this.updateUrlInfo(data.long_url, url.id);
+            // Scans the URL to find out if it's safe or not, handled by workers.
+            if (config_1.default.OPTIONS.SCAN_URLS) {
+                if (config_1.default.USE_WORKER) {
+                    myQueue.add({
+                        type: "SCAN_URL",
+                        data: { long_url: data.long_url, id: url.id },
+                    });
+                }
+                else {
+                    yield this.updateUrlInfo(data.long_url, url.id);
+                }
+            }
             return url;
         });
         this.getMany = (user_id, opts) => __awaiter(this, void 0, void 0, function* () {
@@ -141,11 +157,23 @@ class UrlService {
                             : undefined,
                     },
                 });
-                // Update user IP info in background worker
-                // TODO: Let workers handle this
-                if (config_1.default.OPTIONS.UPDATE_USER_IP_INFO)
-                    yield this.updateUserIpInfo(ip, url_click.id);
-                return { url: url.long_url, is_safe: url.is_safe };
+                // Update user IP info using background worker
+                if (config_1.default.OPTIONS.UPDATE_USER_IP_INFO) {
+                    if (config_1.default.USE_WORKER) {
+                        myQueue.add({
+                            type: "IP_INFO",
+                            data: { ip, id: url_click.id },
+                        });
+                    }
+                    else {
+                        yield this.updateUserIpInfo(ip, url_click.id);
+                    }
+                }
+                return {
+                    email: url.owner_id,
+                    url: url.long_url,
+                    is_safe: url.is_safe,
+                };
             }
             catch (error) {
                 // console.log(error);

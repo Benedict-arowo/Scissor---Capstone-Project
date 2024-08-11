@@ -8,34 +8,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetDeletableTokens = exports.DeleteTokens = void 0;
+const _1 = require(".");
+const node_cron_1 = __importDefault(require("node-cron"));
 const db_1 = require("../../prisma/db");
 /**
  * Deletes tokens based on the provided array of IDs.
- * @param ids - An array of string IDs representing the tokens to be deleted.
  */
-const DeleteTokens = (ids) => __awaiter(void 0, void 0, void 0, function* () {
-    const delete_list = [];
+const DeleteTokens = () => __awaiter(void 0, void 0, void 0, function* () {
     const tokens = yield db_1.Token.findMany({
         where: {
-            OR: ids.map((id) => ({
-                user_id: id,
-            })),
+            expiration_date: {
+                gte: new Date(new Date().setHours(0, 0, 0)),
+                lte: new Date(new Date().setHours(23, 59, 59, 999)),
+            },
         },
     });
-    tokens.forEach((token) => {
-        if (token.user_id && token.expiration_date <= new Date()) {
-            delete_list.push(token.user_id);
-        }
-    });
-    yield db_1.Token.deleteMany({
-        where: {
-            OR: delete_list.map((id) => ({
-                user_id: id,
-            })),
-        },
-    });
+    console.log("Attempting to delete", tokens.length, "tokens.");
+    if (tokens.length > 0) {
+        yield db_1.Token.deleteMany({
+            where: {
+                expiration_date: {
+                    gte: new Date(new Date().setHours(0, 0, 0)),
+                    lte: new Date(new Date().setHours(23, 59, 59, 999)),
+                },
+            },
+        });
+        console.log("Deletion successful.");
+    }
 });
 exports.DeleteTokens = DeleteTokens;
 /**
@@ -60,25 +64,36 @@ const GetDeletableTokens = () => __awaiter(void 0, void 0, void 0, function* () 
     return tokens;
 });
 exports.GetDeletableTokens = GetDeletableTokens;
-// Function to send email notifications
-// const sendEmailNotifications = async () => {
-// 	const oneHourFromNow = new Date(Date.now() + 3600000);
-// 	const expiringTokens = await Token.find({
-// 		expiration: { $lte: oneHourFromNow },
-// 	});
-// 	// expiringTokens.forEach((token) => {
-// 	// 	const mailOptions = {
-// 	// 		from: "your-email@gmail.com",
-// 	// 		to: token.userEmail,
-// 	// 		subject: "Token Expiration Notice",
-// 	// 		text: `Your token is about to expire at ${token.expiration}. Please renew it.`,
-// 	// 	};
-// 	// 	transporter.sendMail(mailOptions, (error, info) => {
-// 	// 		if (error) {
-// 	// 			console.log("Error sending email:", error);
-// 	// 		} else {
-// 	// 			console.log("Email sent:", info.response);
-// 	// 		}
-// 	// 	});
-// 	// });
-// };
+const deleteTokens = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const tokens = yield (0, exports.GetDeletableTokens)();
+        // Optionally, send emails or perform other actions here
+        console.log(tokens);
+        console.log("Successfully fetched deletable tokens.");
+        if (tokens.length === 0)
+            return;
+        (0, _1.sendEmailNotifications)(tokens
+            .filter((token) => token.user_id) // Only tokens with a valid user_id
+            .map((token) => ({
+            email: token.user_id,
+            message: `Dear User, \nYour token with the ID ${token.token} is about to be deleted. \n\nRegards,\nThe Admin Team`,
+            subject: "Token Deletion Notice",
+        })));
+        // Schedule the deletion of tokens at 23:00
+        const deletionCron = node_cron_1.default.schedule("0 23 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                yield (0, exports.DeleteTokens)();
+                console.log("Successfully deleted tokens.");
+            }
+            catch (error) {
+                console.error("Error deleting tokens:", error);
+            }
+        }), {
+            scheduled: false, // Ensures this cron job is not automatically scheduled
+        });
+        deletionCron.start();
+    }
+    catch (error) {
+        console.error("Error fetching deletable tokens:", error);
+    }
+});

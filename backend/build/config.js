@@ -7,6 +7,7 @@ const config = {
     NODE_ENV: "production",
     PORT: parseInt(process.env.PORT) || 5000,
     JWT_SECERET: process.env.JWT_SECERET,
+    USE_WORKER: process.env.USE_WORKER === "true" ? true : false,
     REDIS: {
         HOST: process.env.REDIS_HOST,
         PORT: parseInt(process.env.REDIS_PORT),
@@ -34,10 +35,9 @@ const config = {
         },
         VIRUSTOTAL_API_KEY: process.env.VIRUSTOTAL_API_KEY,
     },
-    CORS_OPTION: {
-        origin: process.env.CORS_ORIGIN
-            ? process.env.CORS_ORIGIN.split("|")
-            : ["http://localhost:3000/"],
+    GMAIL: {
+        USER: process.env.GMAIL_USER,
+        PASS: process.env.GMAIL_PASS,
     },
 };
 exports.default = config;
