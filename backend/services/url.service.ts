@@ -79,11 +79,14 @@ class UrlService {
 
 		// Scans the URL to find out if it's safe or not, handled by workers.
 		if (config.OPTIONS.SCAN_URLS) {
-			myQueue.add({
-				type: "SCAN_URL",
-				data: { long_url: data.long_url, id: url.id },
-			});
-			// await this.updateUrlInfo(data.long_url, url.id);
+			if (config.USE_WORKER) {
+				myQueue.add({
+					type: "SCAN_URL",
+					data: { long_url: data.long_url, id: url.id },
+				});
+			} else {
+				await this.updateUrlInfo(data.long_url, url.id);
+			}
 		}
 
 		return url;
@@ -168,10 +171,14 @@ class UrlService {
 
 			// Update user IP info using background worker
 			if (config.OPTIONS.UPDATE_USER_IP_INFO) {
-				myQueue.add({
-					type: "IP_INFO",
-					data: { ip, id: url_click.id },
-				});
+				if (config.USE_WORKER) {
+					myQueue.add({
+						type: "IP_INFO",
+						data: { ip, id: url_click.id },
+					});
+				} else {
+					await this.updateUserIpInfo(ip, url_click.id);
+				}
 			}
 			return {
 				email: url.owner_id,
