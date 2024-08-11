@@ -34,10 +34,9 @@ const config: Iconfig = {
 		},
 		VIRUSTOTAL_API_KEY: process.env.VIRUSTOTAL_API_KEY as string,
 	},
-	CORS_OPTION: {
-		origin: process.env.CORS_ORIGIN
-			? (process.env.CORS_ORIGIN as string).split("|")
-			: ["http://localhost:3000/"],
+	GMAIL: {
+		USER: process.env.GMAIL_USER as string,
+		PASS: process.env.GMAIL_PASS as string,
 	},
 };
 
@@ -77,7 +76,8 @@ interface Iconfig {
 		};
 		VIRUSTOTAL_API_KEY: string;
 	};
-	CORS_OPTION: {
-		origin: string | string[];
+	GMAIL: {
+		USER: string;
+		PASS: string;
 	};
 }

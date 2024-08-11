@@ -1,33 +1,43 @@
-import cron from "node-cron";
-import { DeleteTokens, GetDeletableTokens } from "./token.cronjob";
+import nodemailer from "nodemailer";
+import config from "../../config";
 
-// Cron job to fetch deletable tokens at midnight (00:00)
-cron.schedule("0 0 * * *", async () => {
-	try {
-		const tokens = await GetDeletableTokens();
-		// Optionally, send emails or perform other actions here
-		console.log(tokens);
-		console.log("Successfully fetched deletable tokens.");
+const transporter = nodemailer.createTransport({
+	service: "gmail",
+	auth: {
+		user: config.GMAIL.USER,
+		pass: config.GMAIL.PASS,
+	},
+});
 
-		if (tokens.length === 0) return;
-		// Schedule the deletion of tokens at 23:00
-		cron.schedule(
-			"0 23 * * *",
-			async () => {
-				try {
-					await DeleteTokens(
-						tokens.map((token) => token.user_id) as string[]
-					);
-					console.log("Successfully deleted tokens.");
-				} catch (error) {
-					console.error("Error deleting tokens:", error);
-				}
-			},
-			{
-				scheduled: false, // Ensures this cron job is not automatically scheduled
-			}
-		);
-	} catch (error) {
-		console.error("Error fetching deletable tokens:", error);
+transporter.verify((error, success) => {
+	if (error) {
+		console.error("Error connecting to the email server:", error);
+	} else {
+		console.log("Email server is ready to send messages:", success);
 	}
 });
+
+// Function to send email notifications
+export const sendEmailNotifications = async (
+	items: { message: string; subject: string; email: string }[]
+) => {
+	const promises = items.map((item) => {
+		const mailOptions = {
+			from: config.GMAIL.USER,
+			to: item.email,
+			subject: item.subject,
+			text: item.message,
+		};
+
+		return transporter.sendMail(mailOptions);
+	});
+
+	try {
+		const results = await Promise.all(promises);
+		results.forEach((info, index) => {
+			console.log(`Email sent to ${items[index].email}:`, info.response);
+		});
+	} catch (error) {
+		console.error("Error sending one or more emails:", error);
+	}
+};

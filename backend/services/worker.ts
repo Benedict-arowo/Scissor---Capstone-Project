@@ -1,6 +1,6 @@
 import Queue from "bull";
-import urlService from "../url.service";
-import config from "../../config";
+import urlService from "./url.service";
+import config from "../config";
 
 const myQueue = new Queue("main", {
 	redis: {

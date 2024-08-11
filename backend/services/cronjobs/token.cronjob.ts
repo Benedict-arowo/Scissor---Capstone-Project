@@ -1,33 +1,33 @@
+import { sendEmailNotifications } from ".";
+import cron from "node-cron";
 import { Token } from "../../prisma/db";
 
 /**
  * Deletes tokens based on the provided array of IDs.
- * @param ids - An array of string IDs representing the tokens to be deleted.
  */
-export const DeleteTokens = async (ids: string[]) => {
-	const delete_list = <string[]>[];
-
+export const DeleteTokens = async () => {
 	const tokens = await Token.findMany({
 		where: {
-			OR: ids.map((id) => ({
-				user_id: id,
-			})),
+			expiration_date: {
+				gte: new Date(new Date().setHours(0, 0, 0)),
+				lte: new Date(new Date().setHours(23, 59, 59, 999)),
+			},
 		},
 	});
 
-	tokens.forEach((token) => {
-		if (token.user_id && token.expiration_date <= new Date()) {
-			delete_list.push(token.user_id);
-		}
-	});
+	console.log("Attempting to delete", tokens.length, "tokens.");
 
-	await Token.deleteMany({
-		where: {
-			OR: delete_list.map((id) => ({
-				user_id: id,
-			})),
-		},
-	});
+	if (tokens.length > 0) {
+		await Token.deleteMany({
+			where: {
+				expiration_date: {
+					gte: new Date(new Date().setHours(0, 0, 0)),
+					lte: new Date(new Date().setHours(23, 59, 59, 999)),
+				},
+			},
+		});
+		console.log("Deletion successful.");
+	}
 };
 
 /**
@@ -55,27 +55,42 @@ export const GetDeletableTokens = async () => {
 	return tokens;
 };
 
-// Function to send email notifications
-// const sendEmailNotifications = async () => {
-// 	const oneHourFromNow = new Date(Date.now() + 3600000);
-// 	const expiringTokens = await Token.find({
-// 		expiration: { $lte: oneHourFromNow },
-// 	});
+const deleteTokens = async () => {
+	try {
+		const tokens = await GetDeletableTokens();
+		// Optionally, send emails or perform other actions here
+		console.log(tokens);
+		console.log("Successfully fetched deletable tokens.");
 
-// 	// expiringTokens.forEach((token) => {
-// 	// 	const mailOptions = {
-// 	// 		from: "your-email@gmail.com",
-// 	// 		to: token.userEmail,
-// 	// 		subject: "Token Expiration Notice",
-// 	// 		text: `Your token is about to expire at ${token.expiration}. Please renew it.`,
-// 	// 	};
+		if (tokens.length === 0) return;
 
-// 	// 	transporter.sendMail(mailOptions, (error, info) => {
-// 	// 		if (error) {
-// 	// 			console.log("Error sending email:", error);
-// 	// 		} else {
-// 	// 			console.log("Email sent:", info.response);
-// 	// 		}
-// 	// 	});
-// 	// });
-// };
+		sendEmailNotifications(
+			tokens
+				.filter((token) => token.user_id) // Only tokens with a valid user_id
+				.map((token) => ({
+					email: token.user_id as string,
+					message: `Dear User, \nYour token with the ID ${token.token} is about to be deleted. \n\nRegards,\nThe Admin Team`,
+					subject: "Token Deletion Notice",
+				}))
+		);
+		// Schedule the deletion of tokens at 23:00
+		const deletionCron = cron.schedule(
+			"0 23 * * *",
+			async () => {
+				try {
+					await DeleteTokens();
+					console.log("Successfully deleted tokens.");
+				} catch (error) {
+					console.error("Error deleting tokens:", error);
+				}
+			},
+			{
+				scheduled: false, // Ensures this cron job is not automatically scheduled
+			}
+		);
+
+		deletionCron.start();
+	} catch (error) {
+		console.error("Error fetching deletable tokens:", error);
+	}
+};
