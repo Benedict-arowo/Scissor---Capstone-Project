@@ -20,6 +20,8 @@ class UrlController {
 			...req.body,
 			user_id: (req as any).user ? (req as any).user.email : undefined,
 		});
+		if ((req as any).user)
+			deleteKeysByPattern(`/url|+|${(req as any).user.email}*`);
 		return res
 			.status(StatusCodes.CREATED)
 			.json({ message: "Sucessfully created URL.", data });
@@ -60,8 +62,6 @@ class UrlController {
 	public visit = Wrapper(async (req: Request, res: Response) => {
 		const { id } = req.params;
 		const parsed_user_agent = UAParser(req.headers["user-agent"]);
-
-		console.log(req.headers["x-forwarded-for"], req.ip);
 
 		const data = await urlService.visit(id, {
 			...parsed_user_agent,

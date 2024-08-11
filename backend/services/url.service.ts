@@ -7,6 +7,8 @@ import {
 import axios from "axios";
 import config from "../config";
 import { upload } from "../middlewears/cloudinary_uploader";
+import Queue from "bull";
+const myQueue = new Queue("main");
 
 class UrlService {
 	/**
@@ -75,10 +77,14 @@ class UrlService {
 			},
 		});
 
-		// TODO: QR Code generation to be handled by background workers
-		// TODO: Let workers handle this
-		if (config.OPTIONS.SCAN_URLS)
-			await this.updateUrlInfo(data.long_url, url.id);
+		// Scans the URL to find out if it's safe or not, handled by workers.
+		if (config.OPTIONS.SCAN_URLS) {
+			myQueue.add({
+				type: "SCAN_URL",
+				data: { long_url: data.long_url, id: url.id },
+			});
+			// await this.updateUrlInfo(data.long_url, url.id);
+		}
 
 		return url;
 	};
@@ -160,11 +166,13 @@ class UrlService {
 				},
 			});
 
-			// Update user IP info in background worker
-			// TODO: Let workers handle this
-			if (config.OPTIONS.UPDATE_USER_IP_INFO)
-				await this.updateUserIpInfo(ip, url_click.id);
-
+			// Update user IP info using background worker
+			if (config.OPTIONS.UPDATE_USER_IP_INFO) {
+				myQueue.add({
+					type: "IP_INFO",
+					data: { ip, id: url_click.id },
+				});
+			}
 			return {
 				email: url.owner_id,
 				url: url.long_url,
@@ -320,7 +328,7 @@ class UrlService {
 		return result;
 	};
 
-	private updateUrlInfo = async (long_url: string, url_id: string) => {
+	public updateUrlInfo = async (long_url: string, url_id: string) => {
 		try {
 			const {
 				data: { data },
@@ -408,7 +416,7 @@ class UrlService {
 		return uploaded;
 	};
 
-	private updateUserIpInfo = async (ip: string, url_click_id: string) => {
+	public updateUserIpInfo = async (ip: string, url_click_id: string) => {
 		try {
 			const request = await axios.get(
 				`http://api.weatherapi.com/v1/ip.json`,
