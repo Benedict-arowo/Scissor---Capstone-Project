@@ -142,6 +142,10 @@ Scissor is a URL shortening service that allows users to create shortened links,
     ```bash
     npm run start:worker
     ```
+9. Start the cronjob (backend service):
+    ```bash
+    npm run start:cronjob
+    ```
 
 ### Workers and Cron Jobs
 

@@ -140,6 +140,39 @@ paths:
                 "422":
                     $ref: "#/components/responses/UnprocessableEntity"
     /token:
+        get:
+            summary: "Retrieve user's token"
+            description: "Fetches the token associated with a specific user ID."
+            tags:
+                - Token
+            security:
+                - bearerAuth: []
+                - ApiKeyAuth: []
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    token:
+                                        type: string
+                                    expiration_date:
+                                        type: string
+                                        format: date-time
+                                        description: "The expiration date of the token."
+                                    is_revoked:
+                                        type: boolean
+                                    last_used:
+                                        type: string
+                                        format: date-time
+                                    user_id:
+                                        type: string
+                "401":
+                    $ref: "#/components/responses/UnauthorizedError"
+                "404":
+                    $ref: "#/components/responses/NotFoundError"
         post:
             description: "Creates a new token"
             tags:
