@@ -6,8 +6,8 @@
 		"start:dev": "nodemon --exec npx ts-node index.ts",
 		"test": "jest --watchAll",
 		"build": "tsc",
-		"start:cronjob": "node ./build/services/cronjobs/run.js",
-		"start:worker": "node ./build/services/worker.js",
+		"start:cronjob": "node build/services/cronjobs/run.js",
+		"start:worker": "node build/services/worker.js",
 		"start:prod": "node build/index.js"
 	},
 	"keywords": [],
