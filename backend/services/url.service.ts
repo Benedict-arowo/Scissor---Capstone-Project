@@ -24,8 +24,8 @@ class UrlService {
 	 * @throws BadrequestError if the URL is invalid, the short URL is already taken, or the expiration date is not within 6 months.
 	 */
 	public create = async (data: UrlServiceCreate) => {
-		if (!this.isValidURL(data.long_url))
-			throw new BadrequestError("Invalid URL provided.");
+		// if (!this.isValidURL(data.long_url))
+		// 	throw new BadrequestError("Invalid URL provided.");
 
 		let valid_short_url = false;
 

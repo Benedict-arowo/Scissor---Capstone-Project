@@ -29,3 +29,5 @@ myQueue.process(async (job: any) => {
 	console.log("Task completed", type, data);
 	return 0;
 });
+
+console.log("Worker is active");

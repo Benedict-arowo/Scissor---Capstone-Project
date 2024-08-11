@@ -3,10 +3,11 @@
 	"version": "1.0.0",
 	"main": "index.ts",
 	"scripts": {
-		"dev": "nodemon --exec npx ts-node index.ts",
+		"start:dev": "nodemon --exec npx ts-node index.ts",
 		"test": "jest --watchAll",
 		"build": "tsc",
-		"start": "node build/index.js"
+		"start:worker": "node ./build/services/cronjobs/worker.js",
+		"start:prod": "node build/index.js"
 	},
 	"keywords": [],
 	"author": "",
