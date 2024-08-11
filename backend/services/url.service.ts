@@ -165,7 +165,11 @@ class UrlService {
 			if (config.OPTIONS.UPDATE_USER_IP_INFO)
 				await this.updateUserIpInfo(ip, url_click.id);
 
-			return { url: url.long_url, is_safe: url.is_safe };
+			return {
+				email: url.owner_id,
+				url: url.long_url,
+				is_safe: url.is_safe,
+			};
 		} catch (error: any) {
 			// console.log(error);
 			if (error.code === "P2025") {

@@ -35,7 +35,7 @@ class UrlController {
 			getRedisKey(req),
 			JSON.stringify({ message: "Success", data }),
 			{
-				EX: 60 * 5, // 5 minutes
+				EX: 60 * 60 * 12, // 12 hours
 			}
 		);
 		return res.status(StatusCodes.OK).json({ message: "Success", data });
@@ -51,7 +51,7 @@ class UrlController {
 			getRedisKey(req),
 			JSON.stringify({ message: "Success", data }),
 			{
-				EX: 60 * 5, // 5 minutes
+				EX: 60 * 60 * 12, // 12 hours
 			}
 		);
 		return res.status(StatusCodes.OK).json({ message: "Success", data });
@@ -67,6 +67,11 @@ class UrlController {
 			...parsed_user_agent,
 			ip: req.headers["x-forwarded-for"] || req.ip,
 		});
+
+		// If the URL has an owner, it means the analytics is being tracked, hence we need to make sure the cached data is up to date.
+		if (data.email) {
+			deleteKeysByPattern(`/url|+|${data.email}*`);
+		}
 
 		return res.render("redirect", { url: data.url, is_safe: data.is_safe });
 	});

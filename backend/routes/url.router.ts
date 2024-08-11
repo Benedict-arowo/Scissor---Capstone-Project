@@ -6,10 +6,10 @@ import Cache from "../middlewears/cache";
 const Router = express.Router();
 
 Router.route("/url/")
-	.get(AuthenticatedOnly, limiter, urlController.getMany)
+	.get(AuthenticatedOnly, limiter, Cache, urlController.getMany)
 	.post(Authenticate, limiter, urlController.create);
 Router.route("/url/:id")
-	.get(AuthenticatedOnly, limiter, urlController.getOne)
+	.get(AuthenticatedOnly, limiter, Cache, urlController.getOne)
 	.patch(AuthenticatedOnly, urlController.update)
 	.delete(AuthenticatedOnly, urlController.delete);
 Router.route("/url/:id/qrcode").post(
