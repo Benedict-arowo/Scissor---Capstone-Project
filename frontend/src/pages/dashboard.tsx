@@ -78,7 +78,7 @@ const Dashboard = () => {
 
 	const Refresh = async (button: HTMLButtonElement) => {
 		button.disabled = true;
-		button.classList.add("pi-spin");
+		if (button.classList.contains("pi")) button.classList.add("pi-spin");
 		toast.current?.show({
 			severity: "info",
 			summary: "Refreshing...",
