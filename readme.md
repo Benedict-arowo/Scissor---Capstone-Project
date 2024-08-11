@@ -52,11 +52,12 @@ Scissor is a URL shortening service that allows users to create shortened links,
 -   Node.js
 -   npm or yarn
 -   Postgresql
--   Redis
--   Cloudinary
+-   [Redis](https://redis.io/)
+-   [Cloudinary](https://cloudinary.com/)
 -   Workers server (optional)
--   VirusTotal
--   WeatherAPI
+-   [VirusTotal](https://virustotal.com/gui/home/upload)
+-   [WeatherAPI](https://weatherapi.com/)
+-   [Gmail](http://gmail.com)
 
 ### Setup
 
@@ -87,6 +88,8 @@ Scissor is a URL shortening service that allows users to create shortened links,
     REDIS_PORT = ""
     REDIS_PASSWORD = ""
     USE_WORKER = false # If you want to use a worker. False by default
+    GMAIL_USER = ""
+    GMAIL_PASS = "" # Use google app password
     ```
 5. Edit the **backend** config file to your desired settings:
     ```js
@@ -122,6 +125,10 @@ Scissor is a URL shortening service that allows users to create shortened links,
     		API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
     	},
     	VIRUSTOTAL_API_KEY: process.env.VIRUSTOTAL_API_KEY as string,
+    },
+    GMAIL: {
+    	USER: process.env.GMAIL_USER as string,
+    	PASS: process.env.GMAIL_PASS as string,
     },
     ```
 6. Edit the **frontend** utils file:
