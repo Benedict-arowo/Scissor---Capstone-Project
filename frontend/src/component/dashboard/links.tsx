@@ -246,7 +246,7 @@ pi-arrow-up"></i>
 											/>
 										)}
 									</div>
-									<div className="flex-1 flex flex-row gap-6">
+									<div className="flex-1 flex flex-row flex-wrap gap-6">
 										<div>
 											<fieldset className="flex flex-col gap-1 flex-1">
 												<label
