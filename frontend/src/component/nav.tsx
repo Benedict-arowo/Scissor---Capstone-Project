@@ -8,7 +8,9 @@ const Nav = () => {
 	return (
 		<nav className="w-full bg-white  px-12 py-4 flex flex-row justify-between items-center">
 			<Link to="/">
-				<h1>Logo</h1>
+				<h1 className="font-bold text-xl text-violet-400">
+					SCIS<span className="text-violet-500">SOR</span>.
+				</h1>
 			</Link>
 
 			<div className="flex flex-row gap-3">

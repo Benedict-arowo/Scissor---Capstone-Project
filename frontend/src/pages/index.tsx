@@ -652,7 +652,9 @@ function Index() {
 				</section>
 
 				<p className="text-gray-500 mt-4 font-light">
-					© 2024 Scissor. All rights reserved.
+					© 2024 <span className="text-violet-400">Scis</span>
+					<span className="text-violet-500">sor</span>. All rights
+					reserved.
 				</p>
 			</footer>
 

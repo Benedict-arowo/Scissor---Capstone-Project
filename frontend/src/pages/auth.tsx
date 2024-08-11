@@ -103,7 +103,7 @@ const Auth = () => {
 
 			<form
 				onSubmit={Authenticate}
-				className="mt-16 flex flex-col items-center gap-4 min-w-[400px]">
+				className="mt-16 flex flex-col items-center gap-4 w-full px-4 md:px-0 md:min-w-[400px]">
 				<fieldset className="w-full flex flex-col">
 					<label htmlFor="email" className="text-sm font-medium">
 						Email:
