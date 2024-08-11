@@ -8,7 +8,13 @@ import axios from "axios";
 import config from "../config";
 import { upload } from "../middlewears/cloudinary_uploader";
 import Queue from "bull";
-const myQueue = new Queue("main");
+const myQueue = new Queue("main", {
+	redis: {
+		host: config.REDIS.HOST,
+		port: config.REDIS.PORT,
+		password: config.REDIS.PASSWORD,
+	},
+});
 
 class UrlService {
 	/**

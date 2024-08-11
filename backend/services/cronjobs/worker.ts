@@ -1,6 +1,14 @@
 import Queue from "bull";
 import urlService from "../url.service";
-const myQueue = new Queue("main");
+import config from "../../config";
+
+const myQueue = new Queue("main", {
+	redis: {
+		host: config.REDIS.HOST,
+		port: config.REDIS.PORT,
+		password: config.REDIS.PASSWORD,
+	},
+});
 
 myQueue.process(async (job: any) => {
 	const { type, data } = job.data;
