@@ -220,7 +220,7 @@ pi-arrow-up"></i>
 								</div>
 							</div>
 							{!item.isCollapsed && (
-								<div className="flex flex-row gap-8 my-4 max-h-[200px] h-full">
+								<div className="flex flex-row flex-wrap gap-8 my-4 ,md:max-h-[200px] h-full">
 									{/* barcode */}
 									<div className="w-[200px] h-[200px] bg-gray-400 grid place-content-center border border-gray-600">
 										{!item.qr_code && (

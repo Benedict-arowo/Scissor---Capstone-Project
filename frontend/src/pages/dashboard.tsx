@@ -28,6 +28,7 @@ const Dashboard = () => {
 		activePage as "home" | "links" | "token"
 	);
 	const activeStyle = "text-white bg-violet-500";
+	const activeStyleMobile = "text-violet-800";
 
 	const FetchToken = async () => {
 		const response = await fetch(`${Config.API_URL}/token`, {
@@ -38,7 +39,7 @@ const Dashboard = () => {
 		});
 
 		if (response.status === 404) return;
-
+		if (response.status === 401) Logout();
 		if (!response.ok) {
 			const data = await response.json();
 			setErr(data.message);
@@ -58,7 +59,7 @@ const Dashboard = () => {
 
 		if (!response.ok) {
 			const data = await response.json();
-
+			if (response.status === 401) Logout();
 			setErr(data.message);
 			throw new Error(data ? data.message : "Error fetching your urls!");
 		}
@@ -75,15 +76,17 @@ const Dashboard = () => {
 		Navigate("/");
 	};
 
-	const Refresh = (button: HTMLButtonElement) => {
+	const Refresh = async (button: HTMLButtonElement) => {
 		button.disabled = true;
+		button.classList.add("pi-spin");
 		toast.current?.show({
 			severity: "info",
 			summary: "Refreshing...",
 		});
-		FetchLinks();
-		FetchToken();
+		await FetchLinks();
+		await FetchToken();
 
+		button.classList.remove("pi-spin");
 		toast.current?.show({
 			severity: "success",
 			summary: "Success",
@@ -105,7 +108,7 @@ const Dashboard = () => {
 	return (
 		<div className="flex flex-row w-full h-screen">
 			<Toast ref={toast} />
-			<aside className="w-[230px] bg-white border-r-2 border-gray-100 flex flex-col gap-4 pt-12 px-3">
+			<aside className="w-[230px] hidden bg-white border-r-2 border-gray-100 md:flex flex-col gap-4 pt-12 px-3">
 				<Link
 					to="/dashboard?page=home"
 					onClick={() => setActive("home")}
@@ -142,7 +145,52 @@ const Dashboard = () => {
 					Logout
 				</button>
 			</aside>
-			<main className="flex-1">
+			<aside className="fixed md:hidden bottom-0 left-0 right-0 h-fit py-2 bg-violet-500 flex flex-row justify-between px-4 items-center">
+				<div className="flex flex-row gap-6 items-center">
+					<Link
+						to="/dashboard?page=home"
+						onClick={() => setActive("home")}
+						className={` rounded-md ${
+							active === "home" ? activeStyleMobile : "text-white"
+						}`}>
+						<i className="pi pi-home text-2xl"></i>
+					</Link>
+					<Link
+						to="/dashboard?page=links"
+						onClick={() => setActive("links")}
+						className={` ${
+							active === "links"
+								? activeStyleMobile
+								: "text-white"
+						}`}>
+						<i className="pi pi-paperclip text-xl"></i>
+					</Link>
+					<Link
+						to="/dashboard?page=token"
+						onClick={() => setActive("token")}
+						className={` ${
+							active === "token"
+								? activeStyleMobile
+								: "text-white"
+						}`}>
+						<i className="pi pi-key text-xl"></i>
+					</Link>
+				</div>
+
+				<div className="flex flex-row gap-2">
+					<button
+						onClick={(e) => Refresh(e.currentTarget)}
+						className="">
+						<i className="pi pi-refresh text-white"></i>
+					</button>
+					<button
+						onClick={Logout}
+						className="px-4 py-1.5 hover:bg-violet-600 font-light rounded-md hover:font-semibold text-md text-black hover:text-white duration-300 transition-all">
+						Logout
+					</button>
+				</div>
+			</aside>
+			<main className="flex-1 overflow-y-auto mb-[48px]">
 				{err && err}
 				{active === "home" && (
 					<Home items={items} setItems={setItems} />

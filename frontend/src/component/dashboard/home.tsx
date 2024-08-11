@@ -41,7 +41,7 @@ const Home = (props: IPROPS) => {
 
 	return (
 		<div className="m-8 max-w-full overflow-hidden">
-			<header className="w-full flex h-[130px] flex-row gap-8 justify-center">
+			<header className="w-full flex md:h-[130px] flex-col md:flex-row gap-8 justify-center ">
 				<div className="w-full h-full rounded-md bg-violet-600 flex flex-col justify-between p-4 border border-gray-500 shadow-md">
 					<p className="text-6xl font-light text-white">
 						{items.length}
@@ -70,7 +70,7 @@ const Home = (props: IPROPS) => {
 				</div>
 			</header>
 
-			<main className="mt-8">
+			<main className="my-8">
 				<section className="w-[500px] mt-4 border border-gray-300 rounded-sm overflow-hidden pb-2 min-h-[200px]">
 					<h3 className="w-full bg-violet-500 text-white px-2 py-1 border border-violet-600 rounded-sm mb-2">
 						Top Urls

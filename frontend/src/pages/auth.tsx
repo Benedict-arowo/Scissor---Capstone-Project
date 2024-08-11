@@ -1,4 +1,4 @@
-import { FormEvent, useContext, useRef, useState } from "react";
+import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Config from "../utils";
 import { Toast } from "primereact/toast";
@@ -74,8 +74,6 @@ const Auth = () => {
 			detail: "Successfully logged you in!",
 		});
 
-		console.log(data);
-
 		UseAuth?.login({
 			token: data.data.access_token,
 		});
@@ -83,6 +81,11 @@ const Auth = () => {
 			Navigate("/dashboard");
 		}, 1000);
 	};
+
+	useEffect(() => {
+		if (UseAuth?.user) Navigate("/dashboard");
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [UseAuth?.user]);
 
 	return (
 		<div className="grid place-content-center">

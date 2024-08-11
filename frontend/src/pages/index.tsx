@@ -141,11 +141,11 @@ function Index() {
 		<div className="h-full bg-white pb-12">
 			<Toast ref={toast} />
 			<main className="h-full min-h-screen">
-				<section className="pt-36 flex flex-col items-center">
-					<h1 className="text-5xl font-bold text-center">
+				<section className="pt-36 flex flex-col items-center px-4 md:px-0">
+					<h1 className="text-2xl md:text-5xl font-bold text-center">
 						Smart and powerful short links
 					</h1>
-					<p className="font-base mt-4 text-gray-500 text-xl text-center">
+					<p className="font-base mt-4 text-gray-500 text-base md:text-xl text-center">
 						Stay in control of your links with advanced features for
 						shortening and tracking.
 					</p>
@@ -238,7 +238,7 @@ function Index() {
 					</div>
 
 					<section className="w-full max-w-[600px]">
-						<div className="flex flex-row justify-center gap-2 mt-8 w-full">
+						<div className="flex flex-row justify-center gap-2 mt-8 w-full px-4 md:px-0">
 							<input
 								className="py-3 px-4 rounded-md border border-gray-300 focus:outline-none focus:border-violet-600 transition duration-300 max-w-[500px] w-full focus:drop-shadow-md"
 								placeholder="http://www.example.com/something?cool=true"
@@ -256,12 +256,12 @@ function Index() {
 							<button
 								onClick={ShortenURL}
 								type="submit"
-								className="px-6 py-1.5 bg-violet-600 hover:bg-violet-700 rounded-md font-semibold text-lg text-white duration-300 transition-all">
+								className="px-4 md:px-6 py-1.5 bg-violet-600 hover:bg-violet-700 rounded-md font-medium md:font-semibold text-lg text-white duration-300 transition-all">
 								Shorten
 							</button>
 						</div>
 
-						<div className="flex flex-row justify-between gap-8 mt-6 w-full">
+						<div className="flex flex-col px-4 md:px-0 md:flex-row justify-between gap-8 mt-6 w-full">
 							<fieldset className="flex flex-col gap-1 flex-1">
 								<label htmlFor="domain">Domain</label>
 								<input
@@ -296,7 +296,7 @@ function Index() {
 					</section>
 				</section>
 
-				<section className="mt-64 flex justify-center">
+				<section className="mt-64 flex justify-center px-4 md:px-0">
 					<section className="flex flex-row flex-wrap justify-center gap-20">
 						<div id="about">
 							<h3 className="font-bold text-3xl">
@@ -341,7 +341,7 @@ function Index() {
 									transform: "translate(0.8rem, 1rem)",
 								}}></div>
 							{[1, 2, 3, 4, 5].map((i) => (
-								<div className="flex flex-row items-center justify-between w-[500px] bg-white px-4 py-3 rounded-lg shadow-md cursor-default z-10">
+								<div className="flex flex-row items-center justify-between w-full md:w-[500px] bg-white px-4 py-3 rounded-lg shadow-md cursor-default z-10">
 									<div
 										key={i}
 										className="flex flex-col gap-0">
@@ -388,7 +388,7 @@ function Index() {
 					</section>
 				</section>
 
-				<section className="flex flex-row justify-center gap-20 mt-32 bg-gray-100 py-12 flex-wrap-reverse">
+				<section className="flex flex-row justify-center gap-20 mt-32 bg-gray-100 py-12 flex-wrap-reverse px-4 md:px-0">
 					<aside className="flex flex-col gap-4 relative">
 						<div
 							className="absolute top-0 right-0 bottom-0 left-0 bg-violet-600 opacity-10 rounded-2xl"
@@ -400,7 +400,7 @@ function Index() {
 							return (
 								<div
 									key={country}
-									className="flex flex-row items-center justify-between w-[500px] bg-white px-4 py-3 rounded-xl shadow-md cursor-default gap-2 z-10 opacity-[7]">
+									className="flex flex-row items-center justify-between w-full md:w-[500px] bg-white px-4 py-3 rounded-xl shadow-md cursor-default gap-2 z-10 opacity-[7]">
 									<img
 										src={findFlagUrlByCountryName(country)}
 										alt={country + "'s flag"}
@@ -428,7 +428,7 @@ function Index() {
 							compliant.
 						</p>
 
-						<div className="mt-8 gap-x-24 gap-y-4 grid grid-cols-2">
+						<div className="mt-8 gap-x-24 gap-y-4 grid grid-cols-1 md:grid-cols-2">
 							<p className="font-semibold text-lg flex flex-row gap-1 items-center">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -561,7 +561,7 @@ function Index() {
 					</div>
 				</section>
 
-				<section className="flex flex-col items-center mt-12">
+				<section className="flex flex-col items-center mt-12 px-4 md:px-0">
 					<h3 id="faq" className="text-3xl pb-8 font-semibold">
 						Frequently asked questions
 					</h3>
@@ -579,21 +579,27 @@ function Index() {
 					</section>
 				</section>
 
-				<section className="bg-gray-100 mt-12 flex flex-row justify-center gap-20 py-24 px-60">
-					<div className="bg-white px-6 py-6 h-fit flex-1 drop-shadow-md">
-						<h3 className="font-bold text-2xl">Total Clicks</h3>
+				<section className="bg-gray-100 mt-12 flex flex-row justify-center gap-4 md:gap-20 py-24 flex-wrap">
+					<div className="bg-white px-6 py-6 h-fit drop-shadow-md md:w-[300px]">
+						<h3 className="font-bold text-lg md:text-2xl">
+							Total Clicks
+						</h3>
 						<span className="text-gray-500">
 							{Math.floor(Math.random() * 10000000)}
 						</span>
 					</div>
-					<div className="bg-white px-6 py-6 h-fit flex-1 drop-shadow-md">
-						<h3 className="font-bold text-2xl">Total Links</h3>
+					<div className="bg-white px-6 py-6 h-fit drop-shadow-md md:w-[300px]">
+						<h3 className="font-bold text-lg md:text-2xl">
+							Total Links
+						</h3>
 						<span className="text-gray-500">
 							{Math.floor(Math.random() * 1000000)}
 						</span>
 					</div>
-					<div className="bg-white px-6 py-6 h-fit flex-1 drop-shadow-md">
-						<h3 className="font-bold text-2xl">Links Today</h3>
+					<div className="bg-white px-6 py-6 h-fit drop-shadow-md md:w-[300px]">
+						<h3 className="font-bold text-lg md:text-2xl">
+							Links Today
+						</h3>
 						<span className="text-gray-500">
 							{Math.floor(Math.random() * 100)}+
 						</span>
@@ -601,9 +607,11 @@ function Index() {
 				</section>
 			</main>
 
-			<footer id="footer" className="flex flex-col gap-2 mt-12 px-60">
-				<section className="flex flex-row justify-between">
-					<div className="flex gap-16 flex-row flex-wrap ">
+			<footer
+				id="footer"
+				className="flex flex-col gap-2 mt-12 items-center w-full px-2 md:px-0">
+				<section className="flex flex-row justify-between w-full px-2 md:px-32 lg:px-48">
+					<div className="flex gap-4 md:gap-16 flex-row ">
 						<a className="text-violet-600" href="#about">
 							About
 						</a>
@@ -619,8 +627,7 @@ function Index() {
 							href="https://github.com/Benedict-arowo"
 							target="_blank">
 							<img
-								width={24}
-								height={24}
+								className="md:w-[24px] md:h-[24px] w-4 h-4"
 								src={github}
 								alt="Visit my Github page."
 							/>
@@ -629,16 +636,14 @@ function Index() {
 							href="https://www.linkedin.com/in/benedict-arowo/"
 							target="_blank">
 							<img
-								width={24}
-								height={24}
+								className="md:w-[24px] md:h-[24px] w-4 h-4"
 								src={linkedin}
 								alt="Visit my LinkedIn page."
 							/>
 						</a>
 						<a href="mailto:benedict.arowo@gmail.com">
 							<img
-								width={24}
-								height={24}
+								className="md:w-[24px] md:h-[24px] w-4 h-4"
 								src={email}
 								alt="Email me."
 							/>
@@ -646,7 +651,7 @@ function Index() {
 					</div>
 				</section>
 
-				<p className="text-gray-500 mt-4">
+				<p className="text-gray-500 mt-4 font-light">
 					© 2024 Scissor. All rights reserved.
 				</p>
 			</footer>
