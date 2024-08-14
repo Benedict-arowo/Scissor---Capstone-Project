@@ -105,6 +105,10 @@ const Dashboard = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [UseAuth?.user]);
 
+	useEffect(() => {
+		window.document.title = `Scissor | Dashboard - ${active}`;
+	}, [active]);
+
 	return (
 		<div className="flex flex-row w-full h-screen">
 			<Toast ref={toast} />

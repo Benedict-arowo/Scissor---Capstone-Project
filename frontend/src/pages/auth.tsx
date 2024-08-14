@@ -87,6 +87,10 @@ const Auth = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [UseAuth?.user]);
 
+	useEffect(() => {
+		window.document.title = `Scissor | ${mode.toUpperCase()}`;
+	}, [mode]);
+
 	return (
 		<div className="grid place-content-center">
 			<Toast ref={toast} />
