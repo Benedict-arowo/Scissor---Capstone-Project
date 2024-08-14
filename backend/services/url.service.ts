@@ -98,9 +98,7 @@ class UrlService {
 		return url;
 	};
 
-	public getMany = async (user_id: string, opts: any) => {
-		const { page = 1, limit = 10 } = opts;
-
+	public getMany = async (user_id: string, { limit, page }: any) => {
 		const data = await URL.findMany({
 			where: {
 				owner_id: user_id,

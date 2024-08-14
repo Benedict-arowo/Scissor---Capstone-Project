@@ -30,9 +30,13 @@ class UrlController {
 	public getMany = Wrapper(async (req: Request, res: Response) => {
 		const {
 			user: { email },
-			params: { page, limit },
+			query: { page, limit },
 		} = req as any;
-		const data = await urlService.getMany(email, { page, limit });
+
+		const data = await urlService.getMany(email, {
+			page: page ? parseInt(page) : 1,
+			limit: limit ? parseInt(limit) : 10,
+		});
 		redisClient.set(
 			getRedisKey(req),
 			JSON.stringify({ message: "Success", data }),
