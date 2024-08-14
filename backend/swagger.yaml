@@ -4,7 +4,7 @@ info:
     description: API for managing URL shortening, QR code generation, and URL information.
     version: 1.0.0
 servers:
-    - url: http://arowobenedict.tech/api
+    - url: https://arowobenedict.tech/api
       description: Production Server
 
 tags:
