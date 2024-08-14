@@ -16,7 +16,8 @@ Scissor is a URL shortening service that allows users to create shortened links,
 6. [Workers and Cron Jobs](#workers-and-cron-jobs)
     - [Workers](#workers)
     - [Cron Jobs](#cron-jobs)
-7. [FAQ](#faq)
+7. [Unique IPs](#unique-ips)
+8. [FAQ](#faq)
 
 ## Features
 
@@ -167,6 +168,31 @@ The backend includes background workers and cron jobs which helps in handling sp
 
 -   URL Expiry Check: Runs everyday to check for URLs that are about to expire and handles their removal from the database. It ensures that outdated links are automatically cleaned up, and an email is sent to the owners of those urls a day before deletion.
 -   Token Expiry Check: Runs everyday to check for tokens about to expire and sends email notifications to users whose tokens are about to expire, and eventually deletes those tokens.
+
+### Unique IPs:
+
+###### How We Make Sure Your Clicks Count – Just Once!
+
+When you interact with a link on our platform, we want to ensure that each click is meaningful and unique. But how do we do that? Let me walk you through our process in a way that’s easy to understand, even if you’re not a tech expert.
+
+##### What Are We Checking?
+
+Whenever you click on a link, two things happen:
+
+Your Device’s ID (IP Address): Every device you use to browse the internet has its own unique ID, kind of like your device’s personal fingerprint.
+The Link You Click (URL ID): Every link on our platform has its own special ID, too.
+
+##### The Magic Behind the Scenes
+
+Our system runs a check called isUnique every time you click on a link. Here’s what it does:
+
+Looks Back 7 Days: We only consider clicks that happened in the last 7 days. This keeps things fresh and relevant.
+Asks a Simple Question: “Has this device clicked on this link in the past week?”
+If your device hasn’t clicked on that link recently, your click is considered unique, and it's recorded as a new interaction. If you have clicked it before within the last 7 days, we don’t count it again.
+
+##### Why Does This Matter?
+
+It is to make sure that each person’s interaction is counted fairly, without duplicates. This helps give you accurate insights, whether you’re tracking how many people are clicking on your links or just making sure your content is reaching a wide audience.
 
 ### FAQ
 
