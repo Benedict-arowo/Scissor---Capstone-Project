@@ -2,7 +2,7 @@ require("dotenv").config({ path: "./.env" });
 
 const config: Iconfig = {
 	ROUTE_PREFIX: "api",
-	BASE_URL: "http://arowobenedict.tech/",
+	BASE_URL: "https://arowobenedict.tech/",
 	NODE_ENV: "production",
 	PORT: parseInt(process.env.PORT as string) || 5000,
 	JWT_SECERET: process.env.JWT_SECERET as string,
