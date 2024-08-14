@@ -118,8 +118,8 @@ class UrlController {
 		const cacheKey = getRedisKey(req);
 		if (await redisClient.get(cacheKey)) {
 			redisClient.del(getRedisKey(req));
-			deleteKeysByPattern(`/url|+|${email}*`);
 		}
+		if (email) deleteKeysByPattern(`/url|+|${email}*`);
 		return res.status(StatusCodes.NO_CONTENT).json({ message: "success" });
 	});
 }
