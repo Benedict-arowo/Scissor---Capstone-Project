@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { findFlagUrlByCountryName } from "country-flags-svg";
 import { Dialog } from "primereact/dialog";
 import linkedin from "../assets/icons/linkedin.svg";
@@ -80,6 +80,10 @@ function Index() {
 			dialogVisible: true,
 		}));
 	};
+
+	useEffect(() => {
+		window.document.title = `Scissor`;
+	}, []);
 
 	const countries = [
 		"United States",
